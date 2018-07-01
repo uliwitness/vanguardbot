@@ -6,8 +6,8 @@
 class vanguardbot : public vanguardbot_base
 {
 public:
-	vanguardbot(std::string inHostname, int inPortNumber, std::string userName, std::string password, std::string channelName)
-		: vanguardbot_base(inHostname, inPortNumber, userName, password, channelName) {}
+	vanguardbot(std::string inHostname, int inPortNumber)
+		: vanguardbot_base(inHostname, inPortNumber) {}
 
 	void	set_line_handler(std::function<void(std::string)> inHandler) { mLineHandler = inHandler; }
 	

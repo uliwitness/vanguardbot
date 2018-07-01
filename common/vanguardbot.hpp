@@ -2,6 +2,18 @@
 
 #include "vanguardbot_base.hpp"
 #include <functional>
+#include <vector>
+#include <map>
+
+
+struct irc_command
+{
+	std::string					command;
+	std::string					userName;
+	std::vector<std::string>	params;
+	std::string					prefix;
+	std::string					tags;
+};
 
 
 class vanguardbot : public vanguardbot_base
@@ -14,7 +26,7 @@ public:
 
 	void	send_chat_message(std::string msg);
 	
-	virtual void	handle_command_for_user_with_params_prefix_tags(std::string command, std::string userName, std::vector<std::string> params, std::string prefix, std::string tags);
+	virtual void	handle_command(irc_command inCommand);
 
 protected:
 	virtual void	process_one_line(std::string currLine);

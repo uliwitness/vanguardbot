@@ -1,7 +1,5 @@
 #include "vanguardbot.hpp"
 #include <iostream>
-#include <vector>
-#include <map>
 
 
 using namespace std;
@@ -31,9 +29,7 @@ void	vanguardbot::send_chat_message(string msg)
 void	vanguardbot::process_one_line(string currLine)
 {
 	string currMessage(currLine);
-	string userName;
-	string prefix;
-	string tags;
+	irc_command command;
 	vector<string> messageParts;
 	
 	if (currMessage.find("@") == 0)
@@ -41,7 +37,7 @@ void	vanguardbot::process_one_line(string currLine)
 		size_t tagsEndOffset = currMessage.find(" ");
 		if (tagsEndOffset != string::npos)
 		{
-			tags = currMessage.substr(1, tagsEndOffset);
+			command.tags = currMessage.substr(1, tagsEndOffset);
 			currMessage.erase(0, tagsEndOffset + 1);
 		}
 	}
@@ -49,22 +45,22 @@ void	vanguardbot::process_one_line(string currLine)
 	size_t firstPartEndOffset = currMessage.find(" ");
 	if (firstPartEndOffset != string::npos)
 	{
-		prefix = currMessage.substr(0, firstPartEndOffset);
+		command.prefix = currMessage.substr(0, firstPartEndOffset);
 		currMessage.erase(0, firstPartEndOffset + 1);
 		
-		if (prefix.find(":") == 0)
+		if (command.prefix.find(":") == 0)
 		{
-			size_t	userSeparatorOffset = prefix.find("!");
+			size_t	userSeparatorOffset = command.prefix.find("!");
 			if(userSeparatorOffset == 0)
 			{
-				userName = prefix.substr(1, userSeparatorOffset - 1);
-				prefix = prefix.substr(userSeparatorOffset + 1, prefix.length() - (userSeparatorOffset + 1));
+				command.userName = command.prefix.substr(1, userSeparatorOffset - 1);
+				command.prefix = command.prefix.substr(userSeparatorOffset + 1, command.prefix.length() - (userSeparatorOffset + 1));
 			}
 		}
 		else
 		{
-			messageParts.push_back(prefix);
-			prefix.erase();
+			messageParts.push_back(command.prefix);
+			command.prefix.erase();
 		}
 		
 		while (true)
@@ -106,21 +102,21 @@ void	vanguardbot::process_one_line(string currLine)
 		messageParts.push_back(currMessage);
 	}
 	
-	string commandName((messageParts.size() > 0) ? messageParts.front() : "");
-	vector<string> params((messageParts.size() > 1) ? messageParts.begin() + 1 : messageParts.begin(), messageParts.end());
+	command.command = string((messageParts.size() > 0) ? messageParts.front() : "");
+	command.params = vector<string>((messageParts.size() > 1) ? messageParts.begin() + 1 : messageParts.begin(), messageParts.end());
 	
-	handle_command_for_user_with_params_prefix_tags(commandName, userName, params, prefix, tags);
+	handle_command(command);
 }
 
 
-void	vanguardbot::handle_command_for_user_with_params_prefix_tags(std::string command, std::string userName, std::vector<std::string> params, std::string prefix, std::string tags)
+void	vanguardbot::handle_command(irc_command inCommand)
 {
-	cout << "Received: " << userName << ": " << command;
-	for (const string& currParam : params)
+	cout << "Received: " << inCommand.userName << ": " << inCommand.command;
+	for (const string& currParam : inCommand.params)
 	{
 		cout << " \"" << currParam << "\"";
 	}
-	cout << "|" << prefix << "|" << tags << endl;
+	cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
 }
 
 

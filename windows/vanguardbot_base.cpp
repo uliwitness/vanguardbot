@@ -68,6 +68,7 @@ vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber)
 	if (connect(mSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
 	{
 		cerr << "Error: Couldn't connect to server." << endl;
+		closesocket(mSocket);
 		mSocket = INVALID_SOCKET;
 		WSACleanup();
 		return;

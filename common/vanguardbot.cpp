@@ -7,11 +7,22 @@ using namespace std;
 
 void	vanguardbot::send_chat_message(string msg)
 {
-	std::string chatCommand("PRIVMSG #");
+	string chatCommand("PRIVMSG #");
 	chatCommand.append(mChannelName);
 	chatCommand.append(" :");
 	chatCommand.append(msg);
 	send_message(chatCommand);
+
+	string externalChatCommand;
+	externalChatCommand.append(":");
+	externalChatCommand.append(mUserName);
+	externalChatCommand.append("!");
+	externalChatCommand.append(mUserName);
+	externalChatCommand.append("@");
+	externalChatCommand.append(mUserName);
+	externalChatCommand.append(".tmi.twitch.tv ");
+	externalChatCommand.append(chatCommand);
+	process_one_line(externalChatCommand);
 }
 
 

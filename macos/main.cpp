@@ -25,10 +25,6 @@ int main(int argc, const char* *argv)
 	}
 
 	vanguardbot	bot("irc.chat.twitch.tv", 6667);
-	bot.set_line_handler([](string inLine)
-	{
-		cout << "Received: " << inLine << endl;
-	});
 	bot.log_in(userName, password, channel);
 	bot.run();
 

@@ -12,11 +12,15 @@ public:
 	void	set_line_handler(std::function<void(std::string)> inHandler) { mLineHandler = inHandler; }
 	
 	void	log_in(std::string userName, std::string password, std::string channelName);
-	
+
+	void	send_chat_message(std::string msg);
+
 protected:
 	virtual void	process_one_line(std::string currLine);
 	virtual void	process_full_lines();
 
 	std::function<void(std::string)>	mLineHandler;
+	std::string							mChannelName;
+	std::string							mUserName;
 };
 

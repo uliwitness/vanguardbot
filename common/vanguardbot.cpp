@@ -5,6 +5,16 @@
 using namespace std;
 
 
+void	vanguardbot::send_chat_message(string msg)
+{
+	std::string chatCommand("PRIVMSG #");
+	chatCommand.append(mChannelName);
+	chatCommand.append(" :");
+	chatCommand.append(msg);
+	send_message(chatCommand);
+}
+
+
 void	vanguardbot::process_one_line(string currLine)
 {
 	mLineHandler(currLine);
@@ -33,6 +43,9 @@ void	vanguardbot::process_full_lines()
 
 void	vanguardbot::log_in(std::string userName, std::string password, std::string channelName)
 {
+	mChannelName = channelName;
+	mUserName = userName;
+	
 	string passMsg("PASS ");
 	passMsg.append(password);
 	send_message(passMsg);
@@ -45,5 +58,7 @@ void	vanguardbot::log_in(std::string userName, std::string password, std::string
 	string joinMsg("JOIN #");
 	joinMsg.append(channelName);
 	send_message(joinMsg);
+	
+	send_chat_message("Hi.");
 }
 

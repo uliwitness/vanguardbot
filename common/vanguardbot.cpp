@@ -5,6 +5,22 @@
 using namespace std;
 
 
+vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)
+	: vanguardbot_base(inHostname, inPortNumber)
+{
+	add_protocol_command_handler("PING", [this](irc_command inCommand)
+	{
+		string pongMessage("PONG ");
+		if (inCommand.params.size() > 0)
+		{
+			pongMessage.append(inCommand.params.front());
+		}
+		cout << "Replying: " << pongMessage << endl;
+		send_message(pongMessage);
+	});
+}
+
+
 void	vanguardbot::send_chat_message(string msg)
 {
 	string chatCommand("PRIVMSG #");
@@ -109,14 +125,22 @@ void	vanguardbot::process_one_line(string currLine)
 }
 
 
-void	vanguardbot::handle_command(irc_command inCommand)
+void	vanguardbot::handle_command(const irc_command& inCommand)
 {
-	cout << "Received: " << inCommand.userName << ": " << inCommand.command;
-	for (const string& currParam : inCommand.params)
+	map<string, irc_command_handler>::iterator foundHandler = mProtocolCommandHandlers.find(inCommand.command);
+	if (foundHandler != mProtocolCommandHandlers.end())
 	{
-		cout << " \"" << currParam << "\"";
+		foundHandler->second(inCommand);
 	}
-	cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
+	else
+	{
+		cout << "Received: " << inCommand.userName << ": " << inCommand.command;
+		for (const string& currParam : inCommand.params)
+		{
+			cout << " \"" << currParam << "\"";
+		}
+		cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
+	}
 }
 
 

@@ -9,9 +9,10 @@ public:
 	vanguardbot(std::string inHostname, int inPortNumber, std::string userName, std::string password, std::string channelName)
 		: vanguardbot_base(inHostname, inPortNumber, userName, password, channelName) {}
 
-
 	void	set_line_handler(std::function<void(std::string)> inHandler) { mLineHandler = inHandler; }
-
+	
+	void	log_in(std::string userName, std::string password, std::string channelName);
+	
 protected:
 	virtual void	process_one_line(std::string currLine);
 	virtual void	process_full_lines();

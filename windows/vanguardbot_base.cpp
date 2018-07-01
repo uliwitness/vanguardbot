@@ -9,7 +9,7 @@
 using namespace std;
 
 
-vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::string userName, std::string password, std::string channelName)
+vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber)
 {
 	WSADATA wsadata;
 
@@ -72,19 +72,6 @@ vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std
 		WSACleanup();
 		return;
 	}
-
-	string passMsg("PASS ");
-	passMsg.append(password);
-	send_message(passMsg);
-	string nickMsg("NICK ");
-	nickMsg.append(userName);
-	send_message(nickMsg);
-	send_message("CAP REQ : twitch.tv / membership");
-	send_message("CAP REQ : twitch.tv / tags");
-	send_message("CAP REQ : twitch.tv / commands");
-	string joinMsg("JOIN #");
-	joinMsg.append(channelName);
-	send_message(joinMsg);
 }
 
 

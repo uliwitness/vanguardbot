@@ -30,3 +30,21 @@ void	vanguardbot::process_full_lines()
 		}
 	}
 }
+
+
+void	vanguardbot::log_in(std::string userName, std::string password, std::string channelName)
+{
+	string passMsg("PASS ");
+	passMsg.append(password);
+	send_message(passMsg);
+	string nickMsg("NICK ");
+	nickMsg.append(userName);
+	send_message(nickMsg);
+	send_message("CAP REQ : twitch.tv / membership");
+	send_message("CAP REQ : twitch.tv / tags");
+	send_message("CAP REQ : twitch.tv / commands");
+	string joinMsg("JOIN #");
+	joinMsg.append(channelName);
+	send_message(joinMsg);
+}
+

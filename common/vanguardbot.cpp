@@ -1,9 +1,9 @@
 #include "vanguardbot.hpp"
 #include <iostream>
+#include <time.h>
 
 
 using namespace std;
-#include <time.h>
 
 
 vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "vanguardbot_base.hpp"
 #include <iostream>
 

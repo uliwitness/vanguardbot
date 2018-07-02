@@ -15,7 +15,6 @@ vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)
 		{
 			pongMessage.append(inCommand.params.front());
 		}
-		cout << "Replying: " << pongMessage << endl;
 		send_message(pongMessage);
 	});
 }

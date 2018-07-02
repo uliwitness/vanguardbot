@@ -19,8 +19,8 @@ protected:
 	virtual void	process_full_lines() = 0;
 	virtual void	log_in(std::string userName, std::string password, std::string channelName) = 0;
 
-	bool								mKeepRunning = true;
-	std::string							mMessageBuffer;
-	SOCKET								mSocket = INVALID_SOCKET;
+	bool			mKeepRunning = true;
+	std::string		mMessageBuffer;
+	SOCKET			mSocket = INVALID_SOCKET;
 };
 

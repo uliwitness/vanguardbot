@@ -8,6 +8,8 @@ using namespace std;
 vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)
 	: vanguardbot_base(inHostname, inPortNumber)
 {
+	srand((unsigned)time(NULL));
+	
 	add_protocol_command_handler("PING", [this](irc_command inCommand)
 	{
 		string pongMessage("PONG ");
@@ -16,6 +18,33 @@ vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)
 			pongMessage.append(inCommand.params.front());
 		}
 		send_message(pongMessage);
+	});
+	
+	add_protocol_command_handler("*", [this](irc_command inCommand)
+	{
+		cout << "Received: " << inCommand.userName << ": " << inCommand.command;
+		for (const string& currParam : inCommand.params)
+		{
+			cout << " \"" << currParam << "\"";
+		}
+		cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
+	});
+
+	add_bot_command_handler("fine", [this](irc_command inCommand)
+	{
+		if (rand() % 2)
+		{
+			send_chat_message("Everything is fine. Nice blinking lights.");
+		}
+		else
+		{
+			send_chat_message("Everything is fi-- fire! It is everywhere! It Burns!");
+		}
+	});
+
+	add_bot_command_handler("*", [this](irc_command inCommand)
+	{
+		send_chat_message("This looks like nothing to me.");
 	});
 }
 
@@ -131,14 +160,60 @@ void	vanguardbot::handle_command(const irc_command& inCommand)
 	{
 		foundHandler->second(inCommand);
 	}
+	else if (inCommand.command.compare("PRIVMSG") == 0 && inCommand.params.size() > 1)
+	{
+		irc_command botCommand;
+		string paramsStr(inCommand.params[1]);	// 0 is channel name.
+		if (paramsStr.length() > 1 && paramsStr[0] == '!')
+		{
+			size_t partSeparatorOffset = paramsStr.find(" ");
+			if (partSeparatorOffset == string::npos)
+				partSeparatorOffset = paramsStr.length();
+			
+			botCommand.command = paramsStr.substr(1, partSeparatorOffset);
+			if ((partSeparatorOffset + 1) < paramsStr.length())
+			{
+				botCommand.params.push_back(paramsStr.substr(partSeparatorOffset, paramsStr.length() - partSeparatorOffset));
+			}
+			
+			map<string, irc_command_handler>::iterator foundHandler = mBotCommandHandlers.find(botCommand.command);
+			if (foundHandler != mBotCommandHandlers.end())
+			{
+				foundHandler->second(botCommand);
+			}
+			else
+			{
+				foundHandler = mBotCommandHandlers.find("*");
+				if (foundHandler != mBotCommandHandlers.end())
+				{
+					foundHandler->second(botCommand);
+				}
+				else
+				{
+					foundHandler = mProtocolCommandHandlers.find("*");
+					if (foundHandler != mProtocolCommandHandlers.end())
+					{
+						foundHandler->second(inCommand);
+					}
+				}
+			}
+		}
+		else
+		{
+			foundHandler = mProtocolCommandHandlers.find("*");
+			if (foundHandler != mProtocolCommandHandlers.end())
+			{
+				foundHandler->second(inCommand);
+			}
+		}
+	}
 	else
 	{
-		cout << "Received: " << inCommand.userName << ": " << inCommand.command;
-		for (const string& currParam : inCommand.params)
+		foundHandler = mProtocolCommandHandlers.find("*");
+		if (foundHandler != mProtocolCommandHandlers.end())
 		{
-			cout << " \"" << currParam << "\"";
+			foundHandler->second(inCommand);
 		}
-		cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
 	}
 }
 

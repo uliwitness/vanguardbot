@@ -3,6 +3,7 @@
 
 
 using namespace std;
+#include <time.h>
 
 
 vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)

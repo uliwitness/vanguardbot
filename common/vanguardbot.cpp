@@ -6,8 +6,8 @@
 using namespace std;
 
 
-vanguardbot::vanguardbot(std::string inHostname, int inPortNumber)
-	: vanguardbot_base(inHostname, inPortNumber)
+vanguardbot::vanguardbot(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
+	: vanguardbot_base(inHostname, inPortNumber, inReadyToRunHandler)
 {
 	srand((unsigned)time(NULL));
 	

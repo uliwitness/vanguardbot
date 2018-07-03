@@ -2,86 +2,54 @@
 #include <iostream>
 
 
-#pragma comment(lib, "Ws2_32.lib")
-
+using namespace Platform;
+using namespace Windows::ApplicationModel;
+using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::Foundation;
+using namespace Windows::Foundation::Collections;
+using namespace Windows::System;
+using namespace Windows::Networking::Sockets;
+using namespace Concurrency;
 
 using namespace std;
 
 
-vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber)
+vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
 {
-	WSADATA wsadata;
+	mSocket = ref new Windows::Networking::Sockets::StreamSocket();
 
-	int error = WSAStartup(0x0202, &wsadata);
-	if (error)
-	{
-		cerr << "Error: Couldn't start up WinSock (" << error << ")" << endl;
-	}
+	mSocket->Control->KeepAlive = false;
 
-	// Did we get the right Winsock version?
-	if (wsadata.wVersion != 0x0202)
+	create_task(mSocket->ConnectAsync(
+		ref new Windows::Networking::HostName(StringFromStdString(inHostname)),
+		StringFromStdString(to_string(inPortNumber)),
+		SocketProtectionLevel::PlainSocket)).then([this, inReadyToRunHandler](task<void> previousTask)
 	{
-		cerr << "Error: Didn't get desired WinSock version." << endl;
-		WSACleanup();
-		return;
-	}
-
-	// Resolve host name into IP:
-	hostent* hostname = gethostbyname(inHostname.c_str());
-	if (!hostname)
-	{
-		int dwError = WSAGetLastError();
-		if (dwError == WSAHOST_NOT_FOUND)
+		try
 		{
-			cout << "Host not found" << endl;
+			previousTask.get(); // Trigger exceptions from tasks up to this point.
+			
+			cout << "Connected." << endl;
+
+			mDataWriter = ref new Windows::Storage::Streams::DataWriter(mSocket->OutputStream);
+			mDataReader = ref new Windows::Storage::Streams::DataReader(mSocket->InputStream);
+
+			inReadyToRunHandler();
 		}
-		else if (dwError == WSANO_DATA)
+		catch (Exception^ exception)
 		{
-			cout << "No data record found" << endl;
+			cout << "Couldn't connect: " << StdStringFromString(exception->Message) << endl;
 		}
-		else
-		{
-			cout << "Function failed with error: " << dwError << endl;
-		}
-
-		WSACleanup();
-		return;
-	}
-	std::string IPAddress(inet_ntoa(**(in_addr**)hostname->h_addr_list));
-
-	//Fill out the information needed to initialize a socket…
-	SOCKADDR_IN target; //Socket address information
-
-	target.sin_family = AF_INET;
-	target.sin_port = htons(inPortNumber);
-	target.sin_addr.s_addr = inet_addr(IPAddress.c_str());
-
-	mSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (mSocket == INVALID_SOCKET)
-	{
-		cerr << "Error: Couldn't create socket." << endl;
-		WSACleanup();
-		return;
-	}
-
-	if (connect(mSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
-	{
-		cerr << "Error: Couldn't connect to server." << endl;
-		closesocket(mSocket);
-		mSocket = INVALID_SOCKET;
-		WSACleanup();
-		return;
-	}
+	});
 }
 
 
 vanguardbot_base::~vanguardbot_base()
 {
-	if (mSocket != INVALID_SOCKET)
+	if (mSocket)
 	{
-		closesocket(mSocket);
-
-		WSACleanup();
+		delete mSocket;
+		mSocket = nullptr;
 	}
 }
 
@@ -92,30 +60,80 @@ void vanguardbot_base::send_message(std::string inMessage)
 	std::string messageWithLineBreak(inMessage);
 	messageWithLineBreak.append("\r\n");
 
-	int result = send(mSocket, messageWithLineBreak.c_str(), (int)messageWithLineBreak.length(), 0);
-	if (result == SOCKET_ERROR)
+	mDataWriter->WriteString(StringFromStdString(messageWithLineBreak));
+
+	// Write the locally buffered data to the network.
+	create_task(mDataWriter->StoreAsync()).then([this, inMessage](task<unsigned int> writeTask)
 	{
-		cerr << "send failed: " << WSAGetLastError() << endl;
-	}
+		try
+		{
+			writeTask.get(); // Trigger exceptions, if any.
+
+			cout << "Sent: " << inMessage.c_str() << endl;
+		}
+		catch (Exception^ exception)
+		{
+			cout << "Failed to send " << inMessage.c_str() << ": " << StdStringFromString(exception->Message) << endl;
+		}
+	});
+}
+
+
+void	vanguardbot_base::read_once()
+{
+	unsigned int amountToRead = max(mDataReader->UnconsumedBufferLength, 1U);
+	create_task(mDataReader->LoadAsync(amountToRead)).then([this](unsigned int size)
+	{
+		if (size == 0)
+		{
+			// The underlying socket was closed before we were able to read the whole data.
+			cancel_current_task();
+		}
+
+		string newData = StdStringFromString(mDataReader->ReadString(size));
+		mMessageBuffer.append(newData);
+
+		process_full_lines();
+	}).then([this](task<void> previousTask)
+	{
+		try
+		{
+			// Try getting all exceptions from the continuation chain above this point.
+			previousTask.get();
+
+			// Everything went ok, so try to receive another string. The receive will continue until the stream is
+			// broken (i.e. peer closed the socket).
+			read_once();
+		}
+		catch (Exception^ exception)
+		{
+			cout << "Couldn't read from stream: " << StdStringFromString(exception->Message) << endl;
+
+			// Explicitly close the socket.
+			delete mSocket;
+			mSocket = nullptr;
+		}
+		catch (task_canceled&)
+		{
+			// Do not print anything here - this will usually happen because user closed the client socket.
+
+			// Explicitly close the socket.
+			delete mSocket;
+			mSocket = nullptr;
+		}
+	});
 }
 
 
 void	vanguardbot_base::run()
 {
-	if (mSocket == INVALID_SOCKET)
+	if (mSocket == nullptr)
 	{
 		return;
 	}
 
 	mKeepRunning = true;
 
-	while (mKeepRunning)
-	{
-		char buffer[513] = {};
-		recv(mSocket, buffer, sizeof(buffer) - 1, 0);
-
-		mMessageBuffer.append(buffer);
-		process_full_lines();
-	}
+	read_once();
 }
 

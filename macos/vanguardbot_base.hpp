@@ -7,7 +7,7 @@
 class vanguardbot_base
 {
 public:
-	vanguardbot_base(std::string inHostname, int inPortNumber);
+	vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler);
 	virtual ~vanguardbot_base();
 
 	void	send_message(std::string inMessage);

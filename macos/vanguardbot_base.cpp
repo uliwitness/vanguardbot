@@ -10,7 +10,7 @@
 using namespace std;
 
 
-vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber)
+vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
 {
 	// Resolve host name into IP:
 	hostent* hostname = gethostbyname(inHostname.c_str());
@@ -42,6 +42,8 @@ vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber)
 		mSocket = -1;
 		return;
 	}
+
+	inReadyToRunHandler();
 }
 
 

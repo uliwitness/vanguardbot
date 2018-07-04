@@ -24,9 +24,11 @@ int main(int argc, const char* *argv)
 		channel = userName;
 	}
 
-	vanguardbot	bot("irc.chat.twitch.tv", 6667);
-	bot.log_in(userName, password, channel);
-	bot.run();
+	vanguardbot	bot("irc.chat.twitch.tv", 6667, []()
+	{
+		bot.log_in(userName, password, channel);
+		bot.run();
+	});
 
     return 0;
 }

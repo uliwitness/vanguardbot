@@ -82,8 +82,10 @@ void vanguardbot_base::send_message(std::string inMessage)
 void	vanguardbot_base::read_once()
 {
 	unsigned int amountToRead = max(mDataReader->UnconsumedBufferLength, 1U);
+	cout << "Trying to read " << amountToRead << "bytes." << endl;
 	create_task(mDataReader->LoadAsync(amountToRead)).then([this](unsigned int size)
 	{
+		cout << "Received " << size << "bytes." << endl;
 		if (size == 0)
 		{
 			// The underlying socket was closed before we were able to read the whole data.
@@ -91,6 +93,7 @@ void	vanguardbot_base::read_once()
 		}
 
 		string newData = StdStringFromString(mDataReader->ReadString(size));
+		cout << "Received " << newData << endl;
 		mMessageBuffer.append(newData);
 
 		process_full_lines();
@@ -116,6 +119,7 @@ void	vanguardbot_base::read_once()
 		catch (task_canceled&)
 		{
 			// Do not print anything here - this will usually happen because user closed the client socket.
+			cout << "socket closed." << endl;
 
 			// Explicitly close the socket.
 			delete mSocket;

@@ -1,6 +1,7 @@
 .vs
 Debug
 x64
+Generated Files
 *.vcxproj.user
 *.vcxproj.filters
 *.xcuserdatad

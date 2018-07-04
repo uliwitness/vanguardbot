@@ -21,6 +21,7 @@ using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::System;
+using namespace Windows::Security::Credentials;
 
 using namespace std;
 
@@ -29,6 +30,39 @@ using namespace std;
 MainPage::MainPage()
 {
 	InitializeComponent();
+
+	PasswordCredential ^credential = nullptr;
+
+	try {
+		auto vault = ref new PasswordVault();
+
+		IVectorView<PasswordCredential ^> ^credentialList = vault->FindAllByResource("vanguardbot_win");
+		if (credentialList->Size > 0)
+		{
+			if (credentialList->Size == 1)
+			{
+				credential = credentialList->GetAt(0);
+			}
+		}
+	}
+	catch (Platform::COMException ^err)
+	{
+		credential = nullptr;
+	}
+
+	if (credential)
+	{
+		credential->RetrievePassword();
+		userNameField->Text = credential->UserName;
+		oauthTokenField->Text = credential->Password;
+	}
+}
+
+
+void vanguardbot_win::MainPage::UsernamePasswordTextBox_TextChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::TextChangedEventArgs^ e)
+{
+	auto vault = ref new Windows::Security::Credentials::PasswordVault();
+	vault->Add(ref new Windows::Security::Credentials::PasswordCredential("vanguardbot_win", userNameField->Text, oauthTokenField->Text));
 }
 
 
@@ -41,9 +75,16 @@ void vanguardbot_win::MainPage::TextBox_TextChanged(Platform::Object^ sender, Wi
 		for (AppDiagnosticInfo ^currApp : appInfoList)
 		{
 			cout << "App: " << StdStringFromString(currApp->AppInfo->DisplayInfo->DisplayName).c_str() << endl;
-		}	
+		}
 	});
+}
 
-	seedField->Text = "Hmmmm...?";
-	//std::cout << seedField->Text << std::endl;
+
+void vanguardbot_win::MainPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	mVanguardBot = new vanguardbot("irc.chat.twitch.tv", 6667, [this]()
+	{
+		mVanguardBot->log_in(StdStringFromString(userNameField->Text), StdStringFromString(oauthTokenField->Text), StdStringFromString(channelNameField->Text));
+		mVanguardBot->run();
+	});
 }

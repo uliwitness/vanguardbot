@@ -6,6 +6,8 @@
 #pragma once
 
 #include "MainPage.g.h"
+#include "vanguardbot.hpp"
+
 
 namespace vanguardbot_win
 {
@@ -18,6 +20,11 @@ namespace vanguardbot_win
 		MainPage();
 
 	private:
+		void UsernamePasswordTextBox_TextChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::TextChangedEventArgs^ e);
 		void TextBox_TextChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::TextChangedEventArgs^ e);
+		void Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+
+	private:
+		vanguardbot *mVanguardBot = nullptr;
 	};
 }

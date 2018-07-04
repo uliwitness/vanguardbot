@@ -97,11 +97,6 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
 				break;
 			}
 		});
-
-		mVanguardBot = new vanguardbot("irc.chat.twitch.tv", 6667, [this]() 
-		{
-			mVanguardBot->log_in(__argv[1], __argv[2], (__argc > 3) ? __argv[3] : __argv[1]);
-		});
     }
     else
     {

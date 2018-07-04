@@ -8,20 +8,22 @@ using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::System;
+using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 using namespace Concurrency;
+using namespace Windows::Storage::Streams;
 
 using namespace std;
 
 
 vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
 {
-	mSocket = ref new Windows::Networking::Sockets::StreamSocket();
+	mSocket = ref new StreamSocket();
 
 	mSocket->Control->KeepAlive = false;
 
 	create_task(mSocket->ConnectAsync(
-		ref new Windows::Networking::HostName(StringFromStdString(inHostname)),
+		ref new HostName(StringFromStdString(inHostname)),
 		StringFromStdString(to_string(inPortNumber)),
 		SocketProtectionLevel::PlainSocket)).then([this, inReadyToRunHandler](task<void> previousTask)
 	{
@@ -31,8 +33,9 @@ vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std
 			
 			cout << "Connected." << endl;
 
-			mDataWriter = ref new Windows::Storage::Streams::DataWriter(mSocket->OutputStream);
-			mDataReader = ref new Windows::Storage::Streams::DataReader(mSocket->InputStream);
+			mDataWriter = ref new DataWriter(mSocket->OutputStream);
+			mDataReader = ref new DataReader(mSocket->InputStream);
+			mDataReader->InputStreamOptions = InputStreamOptions::ReadAhead;
 
 			inReadyToRunHandler();
 		}
@@ -82,10 +85,12 @@ void vanguardbot_base::send_message(std::string inMessage)
 void	vanguardbot_base::read_once()
 {
 	unsigned int amountToRead = max(mDataReader->UnconsumedBufferLength, 1U);
-	cout << "Trying to read " << amountToRead << "bytes." << endl;
+	if (amountToRead > 1)
+	{
+		cout << "Reading " << amountToRead << " bytes in one go." << endl;
+	}
 	create_task(mDataReader->LoadAsync(amountToRead)).then([this](unsigned int size)
 	{
-		cout << "Received " << size << "bytes." << endl;
 		if (size == 0)
 		{
 			// The underlying socket was closed before we were able to read the whole data.
@@ -93,7 +98,6 @@ void	vanguardbot_base::read_once()
 		}
 
 		string newData = StdStringFromString(mDataReader->ReadString(size));
-		cout << "Received " << newData << endl;
 		mMessageBuffer.append(newData);
 
 		process_full_lines();

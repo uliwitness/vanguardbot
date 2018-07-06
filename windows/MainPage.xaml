@@ -10,12 +10,15 @@
 
     <Grid>
         <TextBlock HorizontalAlignment="Left" Margin="28,35,0,0" Text="User Name:" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <TextBox x:Name="userNameField" HorizontalAlignment="Left" Margin="122,29,0,0" Text="uliwitness" VerticalAlignment="Top" Width="420" TextChanged="UsernamePasswordTextBox_TextChanged"/>
-        <Button x:Name="connectButton" Content="Connect" HorizontalAlignment="Left" Margin="184,170,0,0" VerticalAlignment="Top" Click="Button_Click"/>
-        <TextBox x:Name="oauthTokenField" HorizontalAlignment="Left" Margin="122,66,0,0" Text="oauth:1234" VerticalAlignment="Top" Width="420" TextChanged="UsernamePasswordTextBox_TextChanged"/>
+        <TextBox x:Name="userNameField" HorizontalAlignment="Left" Margin="157,29,0,0" Text="uliwitness" VerticalAlignment="Top" Width="385" TextChanged="UsernamePasswordTextBox_TextChanged"/>
+        <Button x:Name="connectButton" Content="Connect" HorizontalAlignment="Left" Margin="467,177,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+        <TextBox x:Name="oauthTokenField" HorizontalAlignment="Left" Margin="157,66,0,0" Text="oauth:1234" VerticalAlignment="Top" Width="385" TextChanged="UsernamePasswordTextBox_TextChanged"/>
         <TextBlock HorizontalAlignment="Left" Margin="28,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="OAuth Token"/><Run Text=":"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="28,109,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Channel:"/>
-        <TextBox x:Name="channelNameField" HorizontalAlignment="Left" Margin="122,103,0,0" Text="uliwitness" VerticalAlignment="Top" Width="420" TextChanged="TextBox_TextChanged"/>
+        <TextBox x:Name="channelNameField" HorizontalAlignment="Left" Margin="157,103,0,0" Text="uliwitness" VerticalAlignment="Top" Width="385" TextChanged="TextBox_TextChanged"/>
+        <TextBlock HorizontalAlignment="Left" Margin="28,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Commands Folder:"/>
+        <TextBox x:Name="commandsPathField" HorizontalAlignment="Left" Margin="157,140,0,0" Text="" VerticalAlignment="Top" Width="349" TextChanged="TextBox_TextChanged"/>
+        <Button x:Name="folderPickerButton" Content="..." HorizontalAlignment="Left" Margin="512,140,0,0" VerticalAlignment="Top" Click="FolderPicker_Click"/>
 
     </Grid>
 </Page>

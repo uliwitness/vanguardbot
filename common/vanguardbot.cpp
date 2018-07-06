@@ -1,12 +1,19 @@
 #include "vanguardbot.hpp"
+#include "ini_file.hpp"
 #include <iostream>
 #include <time.h>
+#include <filesystem>
+#include <fstream>
 
 
 using namespace std;
 
+#ifdef _WIN32
+using namespace std::experimental::filesystem::v1;
+#endif
 
-vanguardbot::vanguardbot(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
+
+vanguardbot::vanguardbot(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	: vanguardbot_base(inHostname, inPortNumber, inReadyToRunHandler)
 {
 	srand((unsigned)time(NULL));
@@ -31,6 +38,23 @@ vanguardbot::vanguardbot(std::string inHostname, int inPortNumber, std::function
 		cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
 	});
 
+	path	commandsFolderPath(inFolderPath);
+	if (!exists(commandsFolderPath))
+	{
+		cout << "No directory " << commandsFolderPath.string() << endl;
+
+		path demoCommandPath(commandsFolderPath / "quote");
+		load_one_command_folder(demoCommandPath.string());
+	}
+	for (const directory_entry& currFile : directory_iterator(commandsFolderPath))
+	{
+		if (currFile.path().filename().string().compare("data") == 0)
+		{
+			continue;
+		}
+		load_one_command_folder(currFile.path().string());
+	}
+
 	add_bot_command_handler("fine", [this](irc_command inCommand)
 	{
 		if (rand() % 2)
@@ -47,6 +71,47 @@ vanguardbot::vanguardbot(std::string inHostname, int inPortNumber, std::function
 	{
 		send_chat_message("This looks like nothing to me.");
 	});
+}
+
+
+void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
+{
+	path		commandFolder(inCommandFolder);
+	string		commandName(commandFolder.filename().string());
+	path		iniFilePath(commandFolder / "info.ini");
+	ini_file	commandInfo(iniFilePath.string());
+
+	string commandType = commandInfo.value_for_key("type");
+
+	if (commandType.compare("quote") == 0)
+	{
+		cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
+
+		string	quotesFileName = commandInfo.value_for_key("file");
+		if (quotesFileName.empty())
+		{
+			quotesFileName = "quotes.txt";
+		}
+		path	quotesFilePath(commandFolder / "data" / quotesFileName);
+
+		add_bot_command_handler(commandName, [this, quotesFilePath](irc_command inCommand)
+		{
+			vector<string> lines;
+			ifstream quotesFile(quotesFilePath.string());
+			while (!quotesFile.eof())
+			{
+				char currLine[1024] = {};
+				quotesFile.getline(currLine, sizeof(currLine) - 1);
+				lines.push_back(currLine);
+			}
+
+			if (!lines.empty())
+			{
+				size_t idx = rand() % lines.size();
+				send_chat_message(lines[idx]);
+			}
+		});
+	}
 }
 
 

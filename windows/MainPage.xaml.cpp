@@ -22,6 +22,8 @@ using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::System;
 using namespace Windows::Security::Credentials;
+using namespace Windows::Storage::Pickers;
+using namespace Windows::Storage;
 
 using namespace std;
 
@@ -82,9 +84,23 @@ void vanguardbot_win::MainPage::TextBox_TextChanged(Platform::Object^ sender, Wi
 
 void vanguardbot_win::MainPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	mVanguardBot = new vanguardbot("irc.chat.twitch.tv", 6667, [this]()
+	mVanguardBot = new vanguardbot("irc.chat.twitch.tv", 6667, StdStringFromString(commandsPathField->Text), [this]()
 	{
 		mVanguardBot->log_in(StdStringFromString(userNameField->Text), StdStringFromString(oauthTokenField->Text), StdStringFromString(channelNameField->Text));
 		mVanguardBot->run();
+	});
+}
+
+
+void vanguardbot_win::MainPage::FolderPicker_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	FolderPicker	^picker = ref new FolderPicker;
+	picker->FileTypeFilter->Append( "*" );
+	IAsyncOperation<StorageFolder ^> ^storageFolderOp = picker->PickSingleFolderAsync();
+	auto asyncTask = concurrency::create_task(storageFolderOp);
+	asyncTask.then([this](StorageFolder ^storageFolder)
+	{
+		cout << "Picked directory: " << StdStringFromString(storageFolder->Path) << endl;
+		commandsPathField->Text = storageFolder->Path;
 	});
 }

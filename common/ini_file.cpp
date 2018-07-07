@@ -7,6 +7,7 @@ using namespace std;
 ini_file::ini_file(const string &inFilePath)
 	: mFilePath(inFilePath)
 {
+	bool isInKey = true;
 	string currKey;
 	string currValue;
 
@@ -14,8 +15,6 @@ ini_file::ini_file(const string &inFilePath)
 
 	while (file.good())
 	{
-		bool isInKey = true;
-
 		int currCh = file.get();
 		switch (currCh)
 		{

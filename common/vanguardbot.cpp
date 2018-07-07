@@ -201,18 +201,19 @@ irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const i
 				currPos = patternToMatchEndOffs + 1;
 				string paramsStr = (inCommand.params.size() > 0) ? inCommand.params[0] : "";
 				
-				vector<string> botParams = split_string_at(paramsStr, " ");
-				
 				time_t rawtime;
 				time( &rawtime );
 				struct tm *info = localtime( &rawtime );
 				char dateStr[512] = {};
 				strftime(dateStr, sizeof(dateStr) - 1, "%x", info);
 				replace_with_in("$DATE", dateStr, patternToMatch);
-				strftime(dateStr, sizeof(dateStr) - 1, "%X", info);
+				strftime(dateStr, sizeof(dateStr) - 1, "%R", info);
 				replace_with_in("$TIME", dateStr, patternToMatch);
 				replace_with_in("$USERNAME", inCommand.userName, patternToMatch);
 				replace_with_in("$_", paramsStr, patternToMatch);
+				
+				vector<string> botParams = split_string_at(paramsStr, " ");
+				
 				for (size_t x = 0; x < botParams.size(); ++x)
 				{
 					string currIndexStr("$");
@@ -227,8 +228,6 @@ irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const i
 					tempCommand.params.push_back("");
 				}
 				tempCommand.params[paramNo - 1] = patternToMatch;
-
-				cout << "pattern: " << patternToMatch << "-->" << paramNo << endl;
 			}
 			else
 				break;

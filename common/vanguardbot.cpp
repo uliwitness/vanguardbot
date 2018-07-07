@@ -203,6 +203,14 @@ irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const i
 				
 				vector<string> botParams = split_string_at(paramsStr, " ");
 				
+				time_t rawtime;
+				time( &rawtime );
+				struct tm *info = localtime( &rawtime );
+				char dateStr[512] = {};
+				strftime(dateStr, sizeof(dateStr) - 1, "%x", info);
+				replace_with_in("$DATE", dateStr, patternToMatch);
+				strftime(dateStr, sizeof(dateStr) - 1, "%X", info);
+				replace_with_in("$TIME", dateStr, patternToMatch);
 				replace_with_in("$USERNAME", inCommand.userName, patternToMatch);
 				replace_with_in("$_", paramsStr, patternToMatch);
 				for (size_t x = 0; x < botParams.size(); ++x)

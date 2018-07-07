@@ -18,36 +18,48 @@ ini_file::ini_file(const string &inFilePath)
 		int currCh = file.get();
 		switch (currCh)
 		{
-		case '=':
-			isInKey = false;
-			break;
-
-		case '\r':
-		case '\n':
-			isInKey = true;
-			if (!currKey.empty())
-			{
-				mSettings[currKey] = currValue;
-				currKey.erase();
-				currValue.erase();
-			}
-			break;
-
-		case 0:
-		case -1:
-			break;
-
-		default:
-			if (isInKey)
-			{
-				currKey.append(1, currCh);
-			}
-			else
-			{
-				currValue.append(1, currCh);
-			}
-			break;
+			case '=':
+				if (isInKey)
+				{
+					isInKey = false;
+				}
+				else
+				{
+					currValue.append(1, currCh);
+				}
+				break;
+				
+			case '\r':
+			case '\n':
+				isInKey = true;
+				if (!currKey.empty())
+				{
+					mSettings[currKey] = currValue;
+					currKey.erase();
+					currValue.erase();
+				}
+				break;
+				
+			case 0:
+			case -1:
+				break;
+				
+			default:
+				if (isInKey)
+				{
+					currKey.append(1, currCh);
+				}
+				else
+				{
+					currValue.append(1, currCh);
+				}
+				break;
 		}
+	}
+	
+	if (!currKey.empty())
+	{
+		mSettings[currKey] = currValue;
 	}
 }
 

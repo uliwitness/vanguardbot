@@ -47,6 +47,8 @@ protected:
 
 	virtual void	handle_command(const irc_command& inCommand);
 
+	irc_command		apply_pattern_to_command(const std::string& pattern, const irc_command &inCommand);
+
 	std::string									mChannelName;
 	std::string									mUserName;
 	std::map<std::string, irc_command_handler>	mProtocolCommandHandlers;

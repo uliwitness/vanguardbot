@@ -45,42 +45,30 @@ void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const
 																   cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
 															   });
 								  
-								  path	commandsFolderPath(inFolderPath);
-								  if (!exists(commandsFolderPath))
-								  {
-									  cout << "No directory " << commandsFolderPath.string() << endl;
-									  
-									  path demoCommandPath(commandsFolderPath / "quote");
-									  load_one_command_folder(demoCommandPath.string());
-								  }
-								  
-								  directory_iterator	directoryIterator(commandsFolderPath);
-								  for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
-								  {
-									  const directory_entry& currFile = *directoryIterator;
-									  if (currFile.path().filename().string().compare("data") == 0)
-									  {
-										  continue;
-									  }
-									  load_one_command_folder(currFile.path().string());
-								  }
-								  
-								  add_bot_command_handler("fine", [this](irc_command inCommand)
-														  {
-															  if (rand() % 2)
-															  {
-																  send_chat_message("Everything is fine. Nice blinking lights.");
-															  }
-															  else
-															  {
-																  send_chat_message("Everything is fi-- fire! It is everywhere! It Burns!");
-															  }
-														  });
-								  
 								  add_bot_command_handler("*", [this](irc_command inCommand)
 														  {
 															  send_chat_message("This looks like nothing to me.");
 														  });
+								  
+								  path	commandsFolderPath(inFolderPath);
+								  if (exists(commandsFolderPath))
+								  {
+									  directory_iterator	directoryIterator(commandsFolderPath);
+									  for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
+									  {
+										  const directory_entry& currFile = *directoryIterator;
+										  if (currFile.path().filename().string().compare("data") == 0 || currFile.path().filename().string().find(".") == 0)
+										  {
+											  continue;
+										  }
+										  load_one_command_folder(currFile.path().string());
+									  }
+								  }
+								  else
+								  {
+									  cout << "No directory " << commandsFolderPath.string() << endl;
+								  }
+
 								  
 								  inReadyToRunHandler();
 							  });
@@ -100,6 +88,10 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 	{
 		cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
 
+		string	addCommandName = commandInfo.value_for_key("addcommand");
+		string	addCommandPattern = commandInfo.value_for_key("addcommandpattern");
+		string	pattern = commandInfo.value_for_key("pattern");
+
 		string	quotesFileName = commandInfo.value_for_key("filename");
 		if (quotesFileName.empty())
 		{
@@ -107,8 +99,9 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 		}
 		path	quotesFilePath(commandFolder.parent_path() / "data" / quotesFileName);
 
-		add_bot_command_handler(commandName, [this, quotesFilePath](irc_command inCommand)
+		add_bot_command_handler(commandName, [this, quotesFilePath, pattern](irc_command inCommand)
 		{
+			irc_command cmd = apply_pattern_to_command(pattern, inCommand);
 			vector<string> lines;
 			ifstream quotesFile(quotesFilePath.string());
 			while (quotesFile.good())
@@ -124,7 +117,117 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 				send_chat_message(lines[idx]);
 			}
 		});
+		
+		if (addCommandName.length() > 0)
+		{
+			add_bot_command_handler(addCommandName, [this, quotesFilePath, addCommandPattern](irc_command inCommand)
+									{
+										irc_command cmd = apply_pattern_to_command(addCommandPattern, inCommand);
+										if (cmd.params.size() > 0 && cmd.params[0].length() > 0)
+										{
+											ofstream quotesFile(quotesFilePath.string(), ios::app);
+											quotesFile << cmd.params[0] << endl;
+										}
+									});
+		}
 	}
+}
+
+
+void replace_with_in(string pattern, string replacement, string &target)
+{
+	size_t currPos = 0;
+	while(currPos < target.length())
+	{
+		size_t foundPos = target.find(pattern, currPos);
+		if (foundPos == string::npos)
+		{
+			return;
+		}
+		
+		target.replace(foundPos, pattern.length(), replacement);
+		currPos = foundPos + replacement.length();
+	}
+}
+
+
+vector<string>	split_string_at(string inTarget, string splitter)
+{
+	vector<string> result;
+	
+	size_t currPos = 0;
+	while (currPos < inTarget.length())
+	{
+		size_t separatorPos = inTarget.find(splitter, currPos);
+		if (separatorPos == string::npos)
+		{
+			separatorPos = inTarget.length();
+		}
+		result.push_back(inTarget.substr(currPos, separatorPos - currPos));
+		
+		currPos = separatorPos + splitter.length();
+	}
+	
+	return result;
+}
+
+
+irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const irc_command &inCommand)
+{
+	irc_command		tempCommand = inCommand;
+	
+	if (pattern.length() > 0)
+	{
+		tempCommand.params.clear();
+
+		size_t currPos = 0;
+		while (currPos < pattern.length())
+		{
+			size_t destNameEndOffs = pattern.find("=", currPos);
+			if (destNameEndOffs != string::npos)
+			{
+				string destName = pattern.substr(currPos + 1, destNameEndOffs - (currPos + 1));	// +1 to remove "$" sign.
+				
+				currPos = destNameEndOffs + 1;
+				
+				size_t patternToMatchEndOffs = pattern.find(",", currPos);
+				if (patternToMatchEndOffs == string::npos)
+				{
+					patternToMatchEndOffs = pattern.length();
+				}
+				
+				string patternToMatch = pattern.substr(currPos, patternToMatchEndOffs - currPos);
+				
+				currPos = patternToMatchEndOffs + 1;
+				string paramsStr = (inCommand.params.size() > 0) ? inCommand.params[0] : "";
+				
+				vector<string> botParams = split_string_at(paramsStr, " ");
+				
+				replace_with_in("$USERNAME", inCommand.userName, patternToMatch);
+				replace_with_in("$_", paramsStr, patternToMatch);
+				for (size_t x = 0; x < botParams.size(); ++x)
+				{
+					string currIndexStr("$");
+					currIndexStr.append(to_string(x + 1));
+					replace_with_in(currIndexStr, botParams[x], patternToMatch);
+				}
+
+				char* endPtr = NULL;
+				long paramNo = strtol(destName.c_str(), &endPtr, 10);
+				while(tempCommand.params.size() < paramNo)
+				{
+					tempCommand.params.push_back("");
+				}
+				tempCommand.params[paramNo - 1] = patternToMatch;
+
+				cout << "pattern: " << patternToMatch << "-->" << paramNo << endl;
+			}
+			else
+				break;
+		}
+	}
+	
+	return tempCommand;
 }
 
 
@@ -174,7 +277,7 @@ void	vanguardbot::process_one_line(string currLine)
 		if (command.prefix.find(":") == 0)
 		{
 			size_t	userSeparatorOffset = command.prefix.find("!");
-			if(userSeparatorOffset == 0)
+			if(userSeparatorOffset != string::npos)
 			{
 				command.userName = command.prefix.substr(1, userSeparatorOffset - 1);
 				command.prefix = command.prefix.substr(userSeparatorOffset + 1, command.prefix.length() - (userSeparatorOffset + 1));
@@ -241,7 +344,8 @@ void	vanguardbot::handle_command(const irc_command& inCommand)
 	}
 	else if (inCommand.command.compare("PRIVMSG") == 0 && inCommand.params.size() > 1)
 	{
-		irc_command botCommand;
+		irc_command botCommand = inCommand;
+		botCommand.params.clear();
 		string paramsStr(inCommand.params[1]);	// 0 is channel name.
 		if (paramsStr.length() > 1 && paramsStr[0] == '!')
 		{
@@ -249,10 +353,10 @@ void	vanguardbot::handle_command(const irc_command& inCommand)
 			if (partSeparatorOffset == string::npos)
 				partSeparatorOffset = paramsStr.length();
 			
-			botCommand.command = paramsStr.substr(1, partSeparatorOffset);
+			botCommand.command = paramsStr.substr(1, partSeparatorOffset - 1);
 			if ((partSeparatorOffset + 1) < paramsStr.length())
 			{
-				botCommand.params.push_back(paramsStr.substr(partSeparatorOffset, paramsStr.length() - partSeparatorOffset));
+				botCommand.params.push_back(paramsStr.substr(partSeparatorOffset + 1, paramsStr.length() - (partSeparatorOffset - 1)));
 			}
 			
 			map<string, irc_command_handler>::iterator foundHandler = mBotCommandHandlers.find(botCommand.command);

@@ -1,11 +1,10 @@
-﻿//
+//
 // App.xaml.cpp
 // Implementation of the App class.
 //
 
 #include "MainPage.xaml.h"
 #include <iostream>
-#include "vanguardbot.hpp"
 
 using namespace vanguardbot_win;
 

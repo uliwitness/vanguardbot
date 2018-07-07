@@ -19,67 +19,71 @@ using namespace fake::filesystem;
 #endif
 
 
-vanguardbot::vanguardbot(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
-	: vanguardbot_base(inHostname, inPortNumber, inReadyToRunHandler)
+void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 {
-	srand((unsigned)time(NULL));
-	
-	add_protocol_command_handler("PING", [this](irc_command inCommand)
-	{
-		string pongMessage("PONG ");
-		if (inCommand.params.size() > 0)
-		{
-			pongMessage.append(inCommand.params.front());
-		}
-		send_message(pongMessage);
-	});
-	
-	add_protocol_command_handler("*", [this](irc_command inCommand)
-	{
-		cout << "Received: " << inCommand.userName << ": " << inCommand.command;
-		for (const string& currParam : inCommand.params)
-		{
-			cout << " \"" << currParam << "\"";
-		}
-		cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
-	});
-
-	path	commandsFolderPath(inFolderPath);
-	if (!exists(commandsFolderPath))
-	{
-		cout << "No directory " << commandsFolderPath.string() << endl;
-
-		path demoCommandPath(commandsFolderPath / "quote");
-		load_one_command_folder(demoCommandPath.string());
-	}
-	
-	directory_iterator	directoryIterator(commandsFolderPath);
-	for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
-	{
-		const directory_entry& currFile = *directoryIterator;
-		if (currFile.path().filename().string().compare("data") == 0)
-		{
-			continue;
-		}
-		load_one_command_folder(currFile.path().string());
-	}
-
-	add_bot_command_handler("fine", [this](irc_command inCommand)
-	{
-		if (rand() % 2)
-		{
-			send_chat_message("Everything is fine. Nice blinking lights.");
-		}
-		else
-		{
-			send_chat_message("Everything is fi-- fire! It is everywhere! It Burns!");
-		}
-	});
-
-	add_bot_command_handler("*", [this](irc_command inCommand)
-	{
-		send_chat_message("This looks like nothing to me.");
-	});
+	vanguardbot_base::connect(inHostname, inPortNumber, inFolderPath, [inReadyToRunHandler, this, inFolderPath]()
+							  {
+								  srand((unsigned)time(NULL));
+								  
+								  add_protocol_command_handler("PING", [this](irc_command inCommand)
+															   {
+																   string pongMessage("PONG ");
+																   if (inCommand.params.size() > 0)
+																   {
+																	   pongMessage.append(inCommand.params.front());
+																   }
+																   send_message(pongMessage);
+															   });
+								  
+								  add_protocol_command_handler("*", [this](irc_command inCommand)
+															   {
+																   cout << "Received: " << inCommand.userName << ": " << inCommand.command;
+																   for (const string& currParam : inCommand.params)
+																   {
+																	   cout << " \"" << currParam << "\"";
+																   }
+																   cout << "|" << inCommand.prefix << "|" << inCommand.tags << endl;
+															   });
+								  
+								  path	commandsFolderPath(inFolderPath);
+								  if (!exists(commandsFolderPath))
+								  {
+									  cout << "No directory " << commandsFolderPath.string() << endl;
+									  
+									  path demoCommandPath(commandsFolderPath / "quote");
+									  load_one_command_folder(demoCommandPath.string());
+								  }
+								  
+								  directory_iterator	directoryIterator(commandsFolderPath);
+								  for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
+								  {
+									  const directory_entry& currFile = *directoryIterator;
+									  if (currFile.path().filename().string().compare("data") == 0)
+									  {
+										  continue;
+									  }
+									  load_one_command_folder(currFile.path().string());
+								  }
+								  
+								  add_bot_command_handler("fine", [this](irc_command inCommand)
+														  {
+															  if (rand() % 2)
+															  {
+																  send_chat_message("Everything is fine. Nice blinking lights.");
+															  }
+															  else
+															  {
+																  send_chat_message("Everything is fi-- fire! It is everywhere! It Burns!");
+															  }
+														  });
+								  
+								  add_bot_command_handler("*", [this](irc_command inCommand)
+														  {
+															  send_chat_message("This looks like nothing to me.");
+														  });
+								  
+								  inReadyToRunHandler();
+							  });
 }
 
 
@@ -335,3 +339,12 @@ void	vanguardbot::log_in(std::string userName, std::string password, std::string
 	send_chat_message("Hi.");
 }
 
+
+void	vanguardbot::log_out()
+{
+	string partMsg("PART #");
+	partMsg.append(mChannelName);
+	send_message(partMsg);
+	
+	send_message("QUIT :bot is shutting down.");
+}

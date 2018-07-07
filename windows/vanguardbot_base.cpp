@@ -16,7 +16,7 @@ using namespace Windows::Storage::Streams;
 using namespace std;
 
 
-vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
+void	vanguardbot_base::connect(const std::string &inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
 {
 	mSocket = ref new StreamSocket();
 

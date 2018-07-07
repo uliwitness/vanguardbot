@@ -1,4 +1,4 @@
-﻿//
+//
 // MainPage.xaml.h
 // Declaration of the MainPage class.
 //
@@ -26,6 +26,6 @@ namespace vanguardbot_win
 		void FolderPicker_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
 	private:
-		vanguardbot *mVanguardBot = nullptr;
+		vanguardbot mVanguardBot;
 	};
 }

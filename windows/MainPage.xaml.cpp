@@ -1,4 +1,4 @@
-﻿//
+//
 // MainPage.xaml.cpp
 // Implementation of the MainPage class.
 //
@@ -84,7 +84,7 @@ void vanguardbot_win::MainPage::TextBox_TextChanged(Platform::Object^ sender, Wi
 
 void vanguardbot_win::MainPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	mVanguardBot = new vanguardbot("irc.chat.twitch.tv", 6667, StdStringFromString(commandsPathField->Text), [this]()
+	mVanguardBot.connect("irc.chat.twitch.tv", 6667, StdStringFromString(commandsPathField->Text), [this]()
 	{
 		mVanguardBot->log_in(StdStringFromString(userNameField->Text), StdStringFromString(oauthTokenField->Text), StdStringFromString(channelNameField->Text));
 		mVanguardBot->run();

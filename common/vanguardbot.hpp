@@ -22,9 +22,12 @@ typedef std::function<void(const irc_command&)> irc_command_handler;
 class vanguardbot : public vanguardbot_base
 {
 public:
-	vanguardbot(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler);
+	vanguardbot() : vanguardbot_base() {}
+	
+	virtual void	connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler);
 
 	void	log_in(std::string userName, std::string password, std::string channelName);
+	void	log_out();
 
 	void	send_chat_message(std::string msg);
 	

@@ -12,6 +12,14 @@
 		5577301020F0517A0006784D /* ini_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577300F20F0517A0006784D /* ini_file.cpp */; };
 		5577301320F0527D0006784D /* vanguardbot_base.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301120F0527D0006784D /* vanguardbot_base.mm */; };
 		5577301620F052940006784D /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577301420F052930006784D /* fake_filesystem.cpp */; };
+		5577301F20F054610006784D /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301E20F054610006784D /* AppDelegate.mm */; };
+		5577302120F054640006784D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5577302020F054640006784D /* Assets.xcassets */; };
+		5577302420F054640006784D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5577302220F054640006784D /* MainMenu.xib */; };
+		5577302720F054640006784D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5577302620F054640006784D /* main.m */; };
+		5577302C20F0ED4D0006784D /* vanguardbot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B382120E9832E000159A4 /* vanguardbot.cpp */; };
+		5577302D20F0ED510006784D /* ini_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577300F20F0517A0006784D /* ini_file.cpp */; };
+		5577302E20F0ED5C0006784D /* vanguardbot_base.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301120F0527D0006784D /* vanguardbot_base.mm */; };
+		5577302F20F0ED610006784D /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577301420F052930006784D /* fake_filesystem.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,10 +45,25 @@
 		5577301220F0527D0006784D /* vanguardbot_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vanguardbot_base.hpp; sourceTree = "<group>"; };
 		5577301420F052930006784D /* fake_filesystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fake_filesystem.cpp; sourceTree = "<group>"; };
 		5577301520F052930006784D /* fake_filesystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fake_filesystem.hpp; sourceTree = "<group>"; };
+		5577301B20F054610006784D /* VanguardBotMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VanguardBotMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5577301D20F054610006784D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		5577301E20F054610006784D /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		5577302020F054640006784D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5577302320F054640006784D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		5577302520F054640006784D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5577302620F054640006784D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5577302820F054640006784D /* VanguardBotMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VanguardBotMac.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		556B381020E98158000159A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5577301820F054610006784D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -55,6 +78,7 @@
 			children = (
 				556B382320E9833E000159A4 /* common */,
 				556B381520E98158000159A4 /* macos */,
+				5577301C20F054610006784D /* VanguardBotMac */,
 				556B381420E98158000159A4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				556B381320E98158000159A4 /* vanguardbot */,
+				5577301B20F054610006784D /* VanguardBotMac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -90,6 +115,20 @@
 			path = common;
 			sourceTree = "<group>";
 		};
+		5577301C20F054610006784D /* VanguardBotMac */ = {
+			isa = PBXGroup;
+			children = (
+				5577301D20F054610006784D /* AppDelegate.h */,
+				5577301E20F054610006784D /* AppDelegate.mm */,
+				5577302020F054640006784D /* Assets.xcassets */,
+				5577302220F054640006784D /* MainMenu.xib */,
+				5577302520F054640006784D /* Info.plist */,
+				5577302620F054640006784D /* main.m */,
+				5577302820F054640006784D /* VanguardBotMac.entitlements */,
+			);
+			path = VanguardBotMac;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -110,6 +149,23 @@
 			productReference = 556B381320E98158000159A4 /* vanguardbot */;
 			productType = "com.apple.product-type.tool";
 		};
+		5577301A20F054610006784D /* VanguardBotMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5577302920F054640006784D /* Build configuration list for PBXNativeTarget "VanguardBotMac" */;
+			buildPhases = (
+				5577301720F054610006784D /* Sources */,
+				5577301820F054610006784D /* Frameworks */,
+				5577301920F054610006784D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VanguardBotMac;
+			productName = VanguardBotMac;
+			productReference = 5577301B20F054610006784D /* VanguardBotMac.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -122,6 +178,14 @@
 					556B381220E98158000159A4 = {
 						CreatedOnToolsVersion = 10.0;
 					};
+					5577301A20F054610006784D = {
+						CreatedOnToolsVersion = 9.4.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
 				};
 			};
 			buildConfigurationList = 556B380E20E98158000159A4 /* Build configuration list for PBXProject "vanguardbot" */;
@@ -130,6 +194,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 556B380A20E98158000159A4;
 			productRefGroup = 556B381420E98158000159A4 /* Products */;
@@ -137,9 +202,22 @@
 			projectRoot = "";
 			targets = (
 				556B381220E98158000159A4 /* vanguardbot */,
+				5577301A20F054610006784D /* VanguardBotMac */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5577301920F054610006784D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5577302120F054640006784D /* Assets.xcassets in Resources */,
+				5577302420F054640006784D /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		556B380F20E98158000159A4 /* Sources */ = {
@@ -154,7 +232,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5577301720F054610006784D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5577302D20F0ED510006784D /* ini_file.cpp in Sources */,
+				5577302F20F0ED610006784D /* fake_filesystem.cpp in Sources */,
+				5577302E20F0ED5C0006784D /* vanguardbot_base.mm in Sources */,
+				5577302720F054640006784D /* main.m in Sources */,
+				5577301F20F054610006784D /* AppDelegate.mm in Sources */,
+				5577302C20F0ED4D0006784D /* vanguardbot.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		5577302220F054640006784D /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5577302320F054640006784D /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		556B381820E98158000159A4 /* Debug */ = {
@@ -284,6 +386,43 @@
 			};
 			name = Release;
 		};
+		5577302A20F054640006784D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VanguardBotMac/VanguardBotMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RCKXACKVZS;
+				INFOPLIST_FILE = VanguardBotMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thevoidsoftware.VanguardBotMac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		5577302B20F054640006784D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VanguardBotMac/VanguardBotMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RCKXACKVZS;
+				INFOPLIST_FILE = VanguardBotMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.thevoidsoftware.VanguardBotMac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -301,6 +440,15 @@
 			buildConfigurations = (
 				556B381B20E98158000159A4 /* Debug */,
 				556B381C20E98158000159A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5577302920F054640006784D /* Build configuration list for PBXNativeTarget "VanguardBotMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5577302A20F054640006784D /* Debug */,
+				5577302B20F054640006784D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

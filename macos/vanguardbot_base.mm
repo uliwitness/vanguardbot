@@ -27,7 +27,7 @@ using namespace std;
 @end
 
 
-vanguardbot_base::vanguardbot_base(std::string inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler)
+void	vanguardbot_base::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 {
 	NSString *hostname = [NSString stringWithUTF8String: inHostname.c_str()];
 

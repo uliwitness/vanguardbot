@@ -100,18 +100,18 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 	{
 		cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
 
-		string	quotesFileName = commandInfo.value_for_key("file");
+		string	quotesFileName = commandInfo.value_for_key("filename");
 		if (quotesFileName.empty())
 		{
 			quotesFileName = "quotes.txt";
 		}
-		path	quotesFilePath(commandFolder / "data" / quotesFileName);
+		path	quotesFilePath(commandFolder.parent_path() / "data" / quotesFileName);
 
 		add_bot_command_handler(commandName, [this, quotesFilePath](irc_command inCommand)
 		{
 			vector<string> lines;
 			ifstream quotesFile(quotesFilePath.string());
-			while (!quotesFile.eof())
+			while (quotesFile.good())
 			{
 				char currLine[1024] = {};
 				quotesFile.getline(currLine, sizeof(currLine) - 1);

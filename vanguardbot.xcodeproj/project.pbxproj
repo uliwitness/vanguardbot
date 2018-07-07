@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		556B381720E98158000159A4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B381620E98158000159A4 /* main.cpp */; };
-		556B381F20E982A8000159A4 /* vanguardbot_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B381D20E982A8000159A4 /* vanguardbot_base.cpp */; };
 		556B382220E9832E000159A4 /* vanguardbot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B382120E9832E000159A4 /* vanguardbot.cpp */; };
+		5577301020F0517A0006784D /* ini_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577300F20F0517A0006784D /* ini_file.cpp */; };
+		5577301320F0527D0006784D /* vanguardbot_base.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301120F0527D0006784D /* vanguardbot_base.mm */; };
+		5577301620F052940006784D /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577301420F052930006784D /* fake_filesystem.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,10 +29,14 @@
 /* Begin PBXFileReference section */
 		556B381320E98158000159A4 /* vanguardbot */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vanguardbot; sourceTree = BUILT_PRODUCTS_DIR; };
 		556B381620E98158000159A4 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		556B381D20E982A8000159A4 /* vanguardbot_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vanguardbot_base.cpp; sourceTree = "<group>"; };
-		556B381E20E982A8000159A4 /* vanguardbot_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vanguardbot_base.hpp; sourceTree = "<group>"; };
 		556B382020E9832E000159A4 /* vanguardbot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vanguardbot.hpp; path = common/vanguardbot.hpp; sourceTree = SOURCE_ROOT; };
 		556B382120E9832E000159A4 /* vanguardbot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vanguardbot.cpp; path = common/vanguardbot.cpp; sourceTree = SOURCE_ROOT; };
+		5577300E20F0517A0006784D /* ini_file.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ini_file.hpp; path = common/ini_file.hpp; sourceTree = SOURCE_ROOT; };
+		5577300F20F0517A0006784D /* ini_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ini_file.cpp; path = common/ini_file.cpp; sourceTree = SOURCE_ROOT; };
+		5577301120F0527D0006784D /* vanguardbot_base.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = vanguardbot_base.mm; sourceTree = "<group>"; };
+		5577301220F0527D0006784D /* vanguardbot_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vanguardbot_base.hpp; sourceTree = "<group>"; };
+		5577301420F052930006784D /* fake_filesystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fake_filesystem.cpp; sourceTree = "<group>"; };
+		5577301520F052930006784D /* fake_filesystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fake_filesystem.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,8 +71,10 @@
 			isa = PBXGroup;
 			children = (
 				556B381620E98158000159A4 /* main.cpp */,
-				556B381D20E982A8000159A4 /* vanguardbot_base.cpp */,
-				556B381E20E982A8000159A4 /* vanguardbot_base.hpp */,
+				5577301220F0527D0006784D /* vanguardbot_base.hpp */,
+				5577301120F0527D0006784D /* vanguardbot_base.mm */,
+				5577301420F052930006784D /* fake_filesystem.cpp */,
+				5577301520F052930006784D /* fake_filesystem.hpp */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -76,6 +84,8 @@
 			children = (
 				556B382120E9832E000159A4 /* vanguardbot.cpp */,
 				556B382020E9832E000159A4 /* vanguardbot.hpp */,
+				5577300F20F0517A0006784D /* ini_file.cpp */,
+				5577300E20F0517A0006784D /* ini_file.hpp */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -136,7 +146,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				556B381F20E982A8000159A4 /* vanguardbot_base.cpp in Sources */,
+				5577301020F0517A0006784D /* ini_file.cpp in Sources */,
+				5577301620F052940006784D /* fake_filesystem.cpp in Sources */,
+				5577301320F0527D0006784D /* vanguardbot_base.mm in Sources */,
 				556B381720E98158000159A4 /* main.cpp in Sources */,
 				556B382220E9832E000159A4 /* vanguardbot.cpp in Sources */,
 			);

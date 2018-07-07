@@ -25,7 +25,7 @@ int main(int argc, const char* *argv)
 		channel = userName;
 	}
 
-	vanguardbot	bot("irc.chat.twitch.tv", 6667, commandsFolder, [&bot, userName, password, channel]()
+	vanguardbot	bot("irc.chat.twitch.tv", 6667, commandsFolder, []()
 	{
 		bot.log_in(userName, password, channel);
 		bot.run();

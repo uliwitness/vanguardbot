@@ -2,7 +2,6 @@
 
 #include <string>
 #include <functional>
-#include <objc/objc.h>
 
 
 class vanguardbot_base
@@ -13,13 +12,14 @@ public:
 
 	void	send_message(std::string inMessage);
 
-	void	run() {}
+	void	run();
 
 protected:
 	virtual void	process_full_lines() = 0;
 	virtual void	log_in(std::string userName, std::string password, std::string channelName) = 0;
 
+	bool			mKeepRunning = true;
 	std::string		mMessageBuffer;
-	id				mIVars = nil;
+	int				mSocket = -1;
 };
 

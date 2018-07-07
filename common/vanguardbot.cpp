@@ -2,7 +2,11 @@
 #include "ini_file.hpp"
 #include <iostream>
 #include <time.h>
+#ifdef _WIN32
 #include <filesystem>
+#else
+#include "fake_filesystem.hpp"
+#endif
 #include <fstream>
 
 
@@ -10,6 +14,8 @@ using namespace std;
 
 #ifdef _WIN32
 using namespace std::experimental::filesystem::v1;
+#else
+using namespace fake::filesystem;
 #endif
 
 
@@ -46,8 +52,11 @@ vanguardbot::vanguardbot(const std::string& inHostname, int inPortNumber, const 
 		path demoCommandPath(commandsFolderPath / "quote");
 		load_one_command_folder(demoCommandPath.string());
 	}
-	for (const directory_entry& currFile : directory_iterator(commandsFolderPath))
+	
+	directory_iterator	directoryIterator(commandsFolderPath);
+	for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
 	{
+		const directory_entry& currFile = *directoryIterator;
 		if (currFile.path().filename().string().compare("data") == 0)
 		{
 			continue;

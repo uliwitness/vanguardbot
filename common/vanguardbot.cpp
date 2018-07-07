@@ -111,10 +111,23 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 				lines.push_back(currLine);
 			}
 
-			if (!lines.empty())
+			if (!lines.empty() )
 			{
-				size_t idx = rand() % lines.size();
-				send_chat_message(lines[idx]);
+				size_t idx = 0;
+				if(inCommand.params.size() == 1)
+				{
+					char* endPtr = NULL;
+					idx = strtoul(inCommand.params[0].c_str(), &endPtr, 10);
+					if (idx < lines.size())
+					{
+						send_chat_message(lines[idx]);
+					}
+				}
+				else
+				{
+					idx = rand() % lines.size();
+					send_chat_message(lines[idx]);
+				}
 			}
 		});
 		

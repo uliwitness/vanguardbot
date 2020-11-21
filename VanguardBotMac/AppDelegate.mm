@@ -13,7 +13,7 @@
 using namespace vanguard;
 
 
-@interface AppDelegate ()
+@interface AppDelegate () <NSTableViewDataSource>
 {
 	vanguardbot mBot;
 }
@@ -25,13 +25,29 @@ using namespace vanguard;
 @property (weak) IBOutlet NSPathControl *commandsFolderField;
 @property (weak) IBOutlet NSButton *connectButton;
 @property (weak) IBOutlet NSProgressIndicator *progress;
+@property (weak) IBOutlet NSTableView *eventsList;
+
+@property (strong) NSMutableArray *events;
 
 @end
 
 @implementation AppDelegate
 
+- (void) log: (NSString*)format, ...
+{
+	va_list list = {};
+	va_start(list, format);
+	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
+	va_end(list);
+	[self.events addObject: message];
+	[self.eventsList noteNumberOfRowsChanged];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	self.events = [@[@"Launched."] mutableCopy];
+	[self.eventsList reloadData];
+	
 	[self.progress startAnimation: nil];
 
 	NSString *commandsFolder = [@"~/Library/Application Support/vanguardbot" stringByExpandingTildeInPath];
@@ -40,7 +56,7 @@ using namespace vanguard;
 	
 	if( ![NSFileManager.defaultManager fileExistsAtPath: commandsFolder] )
 	{
-		NSLog(@"Creating commands folder.");
+		[self log: @"Creating commands folder at \"%@\"", commandsFolder];
 		NSURL * exampleCommandsURL = [NSBundle.mainBundle URLForResource: @"example_commands" withExtension: nil subdirectory: nil];
 		[NSFileManager.defaultManager copyItemAtURL: exampleCommandsURL toURL: commandsFolderURL error: NULL];
 	}
@@ -82,6 +98,7 @@ using namespace vanguard;
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
 	[self.progress startAnimation: nil];
+	[self log: @"Signing off..."];
 
 	mBot.log_out();
 	
@@ -104,15 +121,27 @@ using namespace vanguard;
 	[NSUserDefaults.standardUserDefaults setObject: channelName forKey:@"VGBChannelName"];
 
 	self.connectButton.enabled = YES;
+	[self log: @"Done."];
 	[self.progress stopAnimation: nil];
 }
 
 - (IBAction)connectToServer:(id)sender
 {
+	[self log: @"Connecting..."];
 	[self.progress startAnimation: nil];
 
 	NSString *commandsFolder = self.commandsFolderField.URL.path;
 	
+	mBot.set_ever_seen_user_handler([self](const string& userName)
+									{
+		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
+		[self log: @"NEW USER! %@", userNameObjC];
+	});
+	mBot.set_today_seen_user_handler([self](const string& userName)
+									{
+		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
+		[self log: @"RETURNING USER! %@", userNameObjC];
+	});
 	mBot.connect("irc.chat.twitch.tv", 6667, commandsFolder.fileSystemRepresentation, [self]()
 				 {
 		NSString *userName = self.userNameField.stringValue;
@@ -121,9 +150,20 @@ using namespace vanguard;
 		mBot.log_in(userName.UTF8String, password.UTF8String, channelName.UTF8String);
 		mBot.run();
 		
+		[self log: @"Connected."];
 		self.connectButton.enabled = NO;
 		[self.progress stopAnimation: nil];
 	});
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+	return self.events.count;
+}
+
+- (nullable id)tableView:(NSTableView *)tableView objectValueForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	return self.events[row];
 }
 
 @end

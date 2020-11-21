@@ -23,6 +23,24 @@ using namespace fake::filesystem;
 
 void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 {
+	mCommandsFolderPath = inFolderPath;
+
+	ifstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::in);
+	mEverSeenUsers.erase(mEverSeenUsers.begin(), mEverSeenUsers.end());
+	char buffer[1024] = {};
+	if( everSeenUsers.is_open() )
+	{
+		while( true )
+		{
+			everSeenUsers.getline(buffer, sizeof(buffer));
+			if( everSeenUsers.eof() || everSeenUsers.bad() )
+			{
+				break;
+			}
+			mEverSeenUsers.insert(string(buffer));
+		}
+	}
+
 	vanguardbot_base::connect(inHostname, inPortNumber, inFolderPath, [inReadyToRunHandler, this, inFolderPath]()
 							  {
 								  srand((unsigned)time(NULL));
@@ -68,7 +86,7 @@ void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const
 								  }
 								  else
 								  {
-									  cout << "No directory " << commandsFolderPath.string() << endl;
+									  cerr << "No directory " << commandsFolderPath.string() << endl;
 								  }
 
 								  
@@ -328,6 +346,21 @@ void	vanguardbot::handle_command(const irc_command& inCommand)
 	}
 	else if (inCommand.command.compare("PRIVMSG") == 0 && inCommand.params.size() > 1)
 	{
+		if( mEverSeenUsers.find(tolower(inCommand.userName)) == mEverSeenUsers.end() )
+		{
+			mTodaySeenUsers.insert(inCommand.userName);
+			mEverSeenUsers.insert(inCommand.userName);
+			mEverSeenUserHandler(inCommand.userName);
+			ofstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::out | ios_base::ate);
+			everSeenUsers.write(inCommand.userName.c_str(), inCommand.userName.length());
+			everSeenUsers.write("\n", 1);
+		}
+		else if( mTodaySeenUsers.find(tolower(inCommand.userName)) == mTodaySeenUsers.end() )
+		{
+			mTodaySeenUsers.insert(inCommand.userName);
+			mTodaySeenUserHandler(inCommand.userName);
+		}
+		
 		irc_command botCommand = inCommand;
 		botCommand.params.clear();
 		string paramsStr(inCommand.params[1]);	// 0 is channel name.

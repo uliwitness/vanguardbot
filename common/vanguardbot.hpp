@@ -41,7 +41,8 @@ namespace vanguard {
 		void	log_in(string userName, string password, string channelName);
 		void	log_out();
 		
-		void	send_chat_message(string msg);
+		//! Send a chat message to the server.
+		void	send_chat_message(const string& msg, bool invisible = false);
 		
 		/*! Bot commands are things like "!quote". or "!addquote What are you doing".
 			Specify the name without the exclamation mark, specify "*" to be called

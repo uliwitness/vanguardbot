@@ -104,3 +104,19 @@ The `incrementcommand` is the name of the command to use for incrementing the co
 `$COUNT` - The count of the counter (in the case of incrementresponse, after incrementing)
 `$CHANNELNAME` - The name of this channel, and therefore the broadcaster of this stream.
 `$USERNAME` - The name of the user who invoked the counter command.
+
+### Timers
+
+A timer is a command that you don't invoke by name, but instead it outputs a message periodically. A simple example timer would be a hydration reminder command that reminds you to drink every half hour (30 minutes) in a `hydratetimer` folder with an `info.ini` file like:
+
+    type=timer
+    intervalminutes=30
+    message=Remember to drink regularly, dehydration is bad for your kidneys!
+
+You could also set up a `hydrate` quote command that shows a random hydration message from a bunch of different messages in a text file and use a timer to trigger that from your `hydratetimer` timer:
+
+    type=timer
+    intervalminutes=30
+    message=!hydrate
+
+The cool thing here is that timers know about commands and will not actually send a "!hydrate" message to Twitch chat. It will just internally pretend that it received this message and show the output from the command (in this case from `!hydrate`).

@@ -21,44 +21,58 @@ using namespace std;
 
 @property NSInputStream * readStream;
 @property NSOutputStream * writeStream;
+@property NSMutableArray<NSTimer *>* timers;
 
 -(instancetype) initWithTextCallback:(void(^)(const char*))textCallback hostname:(NSString *)hostname portNumber:(int)inPortNumber;
 
 @end
 
 
-void	vanguardbot_base::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
-{
-	NSString *hostname = [NSString stringWithUTF8String: inHostname.c_str()];
-
-	mIVars = [[VGBIVars alloc] initWithTextCallback: ^(const char* msg)
-			  {
-			  this->mMessageBuffer.append(msg);
-			  this->process_full_lines();
-			  } hostname: hostname portNumber: inPortNumber];
-
-	inReadyToRunHandler();
-}
-
-
-vanguardbot_base::~vanguardbot_base()
-{
-	mIVars = nil;
-}
-
-
-void vanguardbot_base::send_message(std::string inMessage)
-{
-	cout << "Sending: " << inMessage << endl;
-	std::string messageWithLineBreak(inMessage);
-	messageWithLineBreak.append("\r\n");
-
-	NSInteger bytesWritten = [[mIVars writeStream] write: (const uint8_t *)messageWithLineBreak.c_str() maxLength: messageWithLineBreak.length()];
-	if( bytesWritten != messageWithLineBreak.length() )
+namespace vanguard {
+	
+	void	vanguardbot_base::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	{
-		NSLog(@"Tried to write %ld bytes, only managed to write %zu", messageWithLineBreak.length(), (long) bytesWritten);
-	}}
+		NSString *hostname = [NSString stringWithUTF8String: inHostname.c_str()];
+		
+		mIVars = [[VGBIVars alloc] initWithTextCallback: ^(const char* msg)
+				  {
+			this->mMessageBuffer.append(msg);
+			this->process_full_lines();
+		} hostname: hostname portNumber: inPortNumber];
+		
+		inReadyToRunHandler();
+	}
+	
+	
+	vanguardbot_base::~vanguardbot_base()
+	{
+		mIVars = nil;
+	}
+	
+	
+	void vanguardbot_base::send_message(std::string inMessage)
+	{
+		cout << "Sending: " << inMessage << endl;
+		std::string messageWithLineBreak(inMessage);
+		messageWithLineBreak.append("\r\n");
+		
+		NSInteger bytesWritten = [[mIVars writeStream] write: (const uint8_t *)messageWithLineBreak.c_str() maxLength: messageWithLineBreak.length()];
+		if( bytesWritten != messageWithLineBreak.length() )
+		{
+			NSLog(@"Tried to write %ld bytes, only managed to write %zu", messageWithLineBreak.length(), (long) bytesWritten);
+		}
+	}
+	
+	void	vanguardbot_base::perform_after(chrono::minutes delay, bool repeat, function<void()> handler)
+	{
+		double interval = delay.count() * 60.0;
+		[((VGBIVars*)mIVars).timers addObject: [NSTimer scheduledTimerWithTimeInterval: (NSTimeInterval) interval repeats: repeat != false block: ^(NSTimer * _Nonnull timer)
+		{
+			handler();
+		}]];
+	}
 
+} /* namespace vanguard */
 
 @implementation VGBIVars
 
@@ -67,6 +81,7 @@ void vanguardbot_base::send_message(std::string inMessage)
 	if (self = [super init] )
 	{
 		_textCallback = textCallback;
+		self.timers = [NSMutableArray new];
 		
 		CFReadStreamRef readStream = NULL;
 		CFWriteStreamRef writeStream = NULL;
@@ -83,6 +98,12 @@ void vanguardbot_base::send_message(std::string inMessage)
 		[self.writeStream scheduleInRunLoop: [NSRunLoop currentRunLoop] forMode: NSDefaultRunLoopMode];
 	}
 	return self;
+}
+
+
+-(void) dealloc
+{
+	[self.timers performSelector: @selector(invalidate)];
 }
 
 

@@ -251,8 +251,8 @@ namespace vanguard {
 			
 			if( addCommandName.length() > 0 )
 			{
-				bool addMustBeManagement = tolower(commandInfo.value_for_key("incrementCommandMustBeManagement")) == "true";
-				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("incrementCommandMustBeSubscriber")) == "true";
+				bool addMustBeManagement = tolower(commandInfo.value_for_key("incrementcommandmustbemanagement")) == "true";
+				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("incrementcommandmustbesubscriber")) == "true";
 
 				add_bot_command_handler(addCommandName, [this, quotesFilePath, incrementResponse](irc_command inCommand)
 										{
@@ -277,6 +277,28 @@ namespace vanguard {
 					send_chat_message(msg);
 				}, addMustBeManagement, addMustBeSubscriber);
 			}
+		}
+		else if (commandType.compare("timer") == 0)
+		{
+			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
+			
+			string			message = commandInfo.value_for_key("message");
+			chrono::minutes	delay = chrono::minutes( atoll(commandInfo.value_for_key("intervalminutes").c_str()));
+
+				if( message.find("!") == 0 )
+				{
+					perform_after(delay, true, [this, message]()
+								  {
+						send_chat_message(message, true); // Only shows result of the command.
+					});
+				}
+				else
+				{
+					perform_after(delay, true, [this, message]()
+								  {
+						send_chat_message(message);
+					});
+				}
 		}
 	}
 	
@@ -347,13 +369,16 @@ namespace vanguard {
 	}
 	
 	
-	void	vanguardbot::send_chat_message(string msg)
+	void	vanguardbot::send_chat_message(const string& msg, bool invisible)
 	{
 		string chatCommand("PRIVMSG #");
 		chatCommand.append(mChannelName);
 		chatCommand.append(" :");
 		chatCommand.append(msg);
-		send_message(chatCommand);
+		if( !invisible )
+		{
+			send_message(chatCommand);
+		}
 		
 		string externalChatCommand;
 		externalChatCommand.append(":");

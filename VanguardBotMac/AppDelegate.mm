@@ -33,20 +33,36 @@ using namespace vanguard;
 
 @implementation AppDelegate
 
+-(NSString *) currentTime
+{
+	static NSDateFormatter * sFormatter = nil;
+	if( !sFormatter )
+	{
+		sFormatter = [NSDateFormatter new];
+		sFormatter.dateStyle = NSDateFormatterNoStyle;
+		sFormatter.timeStyle = NSDateFormatterShortStyle;
+	}
+	
+	return [sFormatter stringFromDate: NSDate.date];
+}
+
 - (void) logLabel: (nullable NSString*)label format: (NSString*)format, ...
 {
 	va_list list = {};
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
+	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	if (label != nil)
 	{
-		NSMutableAttributedString * attrLabel = [[NSMutableAttributedString alloc] initWithString: [label stringByAppendingString: @": "] attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: 18.0] }];
-		[attrLabel appendAttributedString: attrMsg];
-		attrMsg = attrLabel;
+		NSAttributedString * attrLabel = [[NSAttributedString alloc] initWithString: [label stringByAppendingString: @": "] attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: 18.0] }];
+		[fullMsg appendAttributedString: attrLabel];
 	}
-	[self.events addObject: attrMsg];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: 18.0] }];
+	[fullMsg appendAttributedString: attrMsg];
+
+	[self.events addObject: fullMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
 	[self.eventsList.window display];
@@ -58,8 +74,11 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
+	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
-	[self.events addObject: attrMsg];
+	[fullMsg appendAttributedString: attrMsg];
+	[self.events addObject: fullMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
 	[self.eventsList.window display];
@@ -71,9 +90,12 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
+	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	NSFont * font = [NSFontManager.sharedFontManager convertFont: [NSFont systemFontOfSize: 18.0] toHaveTrait: NSItalicFontMask];
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: font }];
-	[self.events addObject: attrMsg];
+	[fullMsg appendAttributedString: attrMsg];
+	[self.events addObject: fullMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
 	[self.eventsList.window display];

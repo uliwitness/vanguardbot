@@ -13,11 +13,12 @@ namespace vanguard {
 	
 	struct irc_command
 	{
-		string			command;
-		string			userName;
-		vector<string>	params;
-		string			prefix;
-		string			tags;
+		string				command;
+		string				userName;
+		vector<string>		params;
+		string				prefix;
+		string				tagsString;
+		map<string,string> 	tags;
 	};
 	
 	

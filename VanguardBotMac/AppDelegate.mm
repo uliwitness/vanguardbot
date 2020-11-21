@@ -41,6 +41,7 @@ using namespace vanguard;
 	va_end(list);
 	[self.events addObject: message];
 	[self.eventsList noteNumberOfRowsChanged];
+	[self.eventsList scrollRowToVisible: self.events.count -1];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification

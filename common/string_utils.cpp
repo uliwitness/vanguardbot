@@ -31,6 +31,20 @@ namespace vanguard {
 		}
 	}
 	
+	string chomp_until_separator_from_string(const string &separator, string& inTarget)
+	{
+		string result;
+		
+		auto pos = inTarget.find(separator);
+		if( pos != string::npos )
+		{
+			result = inTarget.substr(0, pos);
+			inTarget.erase(0, pos + separator.length());
+		}
+		
+		return result;
+	}
+	
 	
 	vector<string>	split_string_at(const string& inTarget, const string& splitter)
 	{

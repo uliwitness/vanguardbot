@@ -17,6 +17,8 @@ namespace vanguard {
 	
 	void replace_with_in(const string& pattern, const string& replacement, string &target);
 
+	string chomp_until_separator_from_string(const string &separator, string& inTarget);
+
 	vector<string>	split_string_at(const string& inTarget, const string& splitter);
 
 	string join_strings_with(const vector<string>& strings, const string& separator);

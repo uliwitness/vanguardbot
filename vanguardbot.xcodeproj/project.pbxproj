@@ -11,7 +11,6 @@
 		556B382220E9832E000159A4 /* vanguardbot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B382120E9832E000159A4 /* vanguardbot.cpp */; };
 		5577301020F0517A0006784D /* ini_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577300F20F0517A0006784D /* ini_file.cpp */; };
 		5577301320F0527D0006784D /* vanguardbot_base.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301120F0527D0006784D /* vanguardbot_base.mm */; };
-		5577301620F052940006784D /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577301420F052930006784D /* fake_filesystem.cpp */; };
 		5577301F20F054610006784D /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301E20F054610006784D /* AppDelegate.mm */; };
 		5577302120F054640006784D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5577302020F054640006784D /* Assets.xcassets */; };
 		5577302420F054640006784D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5577302220F054640006784D /* MainMenu.xib */; };
@@ -19,7 +18,6 @@
 		5577302C20F0ED4D0006784D /* vanguardbot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556B382120E9832E000159A4 /* vanguardbot.cpp */; };
 		5577302D20F0ED510006784D /* ini_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577300F20F0517A0006784D /* ini_file.cpp */; };
 		5577302E20F0ED5C0006784D /* vanguardbot_base.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5577301120F0527D0006784D /* vanguardbot_base.mm */; };
-		5577302F20F0ED610006784D /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577301420F052930006784D /* fake_filesystem.cpp */; };
 		5577303220F134450006784D /* string_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577303020F134450006784D /* string_utils.cpp */; };
 		5577303320F1344D0006784D /* string_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5577303020F134450006784D /* string_utils.cpp */; };
 		5582256D25691DAF00988E88 /* example_commands in Resources */ = {isa = PBXBuildFile; fileRef = 5582256C25691DAF00988E88 /* example_commands */; };
@@ -46,8 +44,6 @@
 		5577300F20F0517A0006784D /* ini_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ini_file.cpp; path = common/ini_file.cpp; sourceTree = SOURCE_ROOT; };
 		5577301120F0527D0006784D /* vanguardbot_base.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = vanguardbot_base.mm; sourceTree = "<group>"; };
 		5577301220F0527D0006784D /* vanguardbot_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vanguardbot_base.hpp; sourceTree = "<group>"; };
-		5577301420F052930006784D /* fake_filesystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fake_filesystem.cpp; sourceTree = "<group>"; };
-		5577301520F052930006784D /* fake_filesystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fake_filesystem.hpp; sourceTree = "<group>"; };
 		5577301B20F054610006784D /* VanguardBotMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VanguardBotMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5577301D20F054610006784D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5577301E20F054610006784D /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -106,8 +102,6 @@
 				556B381620E98158000159A4 /* main.cpp */,
 				5577301220F0527D0006784D /* vanguardbot_base.hpp */,
 				5577301120F0527D0006784D /* vanguardbot_base.mm */,
-				5577301420F052930006784D /* fake_filesystem.cpp */,
-				5577301520F052930006784D /* fake_filesystem.hpp */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -237,7 +231,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5577301020F0517A0006784D /* ini_file.cpp in Sources */,
-				5577301620F052940006784D /* fake_filesystem.cpp in Sources */,
 				5577303220F134450006784D /* string_utils.cpp in Sources */,
 				5577301320F0527D0006784D /* vanguardbot_base.mm in Sources */,
 				556B381720E98158000159A4 /* main.cpp in Sources */,
@@ -250,7 +243,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5577302D20F0ED510006784D /* ini_file.cpp in Sources */,
-				5577302F20F0ED610006784D /* fake_filesystem.cpp in Sources */,
 				5577302E20F0ED5C0006784D /* vanguardbot_base.mm in Sources */,
 				5577303320F1344D0006784D /* string_utils.cpp in Sources */,
 				5577302720F054640006784D /* main.m in Sources */,
@@ -279,7 +271,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -324,7 +316,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -337,7 +329,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -376,7 +368,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

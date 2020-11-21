@@ -9,13 +9,13 @@ A Twitch chatbot that is supposed to be easy to manage, easy to update, flexible
 - Unlimited number of quote pools
 - Unlimited number of joinable queues
 - Arbitrary names for "add quote" command
+- Notifications about first-time chatters (per stream, and ever)
 
 ## Planned Features
 
 - Counters
 - Command groups
 - Commands for setting the game and stream title on Twitch based on presets
-- Notifications about first-time chatters (per stream, and ever)
 - Setup GUI for creating commands
 - Working Windows support
 - Moderator-only commands

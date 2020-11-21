@@ -17,6 +17,14 @@ namespace vanguard {
 #endif
 	
 	
+	static string field_from_map(const string& key, const map<string, string>& tags, const string& fallback = string())
+	{
+		auto foundBadge = tags.find(key);
+		return (foundBadge == tags.end() ? fallback : foundBadge->second);
+	}
+	
+	
+
 	void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	{
 		mCommandsFolderPath = inFolderPath;
@@ -58,7 +66,7 @@ namespace vanguard {
 				{
 					cout << " \"" << currParam << "\"";
 				}
-#if 1
+
 				string tagsString("\n");
 				for( auto tag : inCommand.tags )
 				{
@@ -68,16 +76,38 @@ namespace vanguard {
 				{
 					tagsString.erase();
 				}
-#else
-				string tagsString(inCommand.tagsString);
-#endif
 				cout << "|" << inCommand.prefix << "\n[" << tagsString << "]" << endl;
 			});
-			
+
+			add_protocol_command_handler("USERSTATE", [this](irc_command inCommand)
+										 {
+				string userName(tolower(inCommand.tags["display-name"]));
+				mUserTags[userName] = inCommand.tags;
+				
+				mUserTags[userName][";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
+
+				cout << "User State: " << userName << ":\n";
+				for( auto tagPair : mUserTags[userName] )
+				{
+					cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
+				}
+			});
+
+			add_protocol_command_handler("ROOMSTATE", [this](irc_command inCommand)
+										 {
+				cout << "Room State:\n";
+				for( auto tagPair : inCommand.tags )
+				{
+					cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
+				}
+				
+				mRoomTags = inCommand.tags;
+			});
+
 			add_bot_command_handler("*", [this](irc_command inCommand)
 									{
 				send_chat_message("This looks like nothing to me.");
-			});
+			}, false, false);
 			
 			path	commandsFolderPath(inFolderPath);
 			if (exists(commandsFolderPath))
@@ -112,7 +142,9 @@ namespace vanguard {
 		ini_file	commandInfo(iniFilePath.string());
 		
 		string commandType = commandInfo.value_for_key("type");
-		
+		bool mustBeManagement = tolower(commandInfo.value_for_key("mustBeManagement")) == "true";
+		bool mustBeSubscriber = tolower(commandInfo.value_for_key("mustBeSubscriber")) == "true";
+
 		if (commandType.compare("quote") == 0)
 		{
 			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
@@ -158,10 +190,13 @@ namespace vanguard {
 						send_chat_message(lines[idx]);
 					}
 				}
-			});
+			}, mustBeManagement, mustBeSubscriber);
 			
 			if (addCommandName.length() > 0)
 			{
+				bool addMustBeManagement = tolower(commandInfo.value_for_key("addCommandMustBeManagement")) == "true";
+				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("addCommandMustBeSubscriber")) == "true";
+
 				add_bot_command_handler(addCommandName, [this, quotesFilePath, addCommandPattern](irc_command inCommand)
 										{
 					irc_command cmd = apply_pattern_to_command(addCommandPattern, inCommand);
@@ -170,7 +205,7 @@ namespace vanguard {
 						ofstream quotesFile(quotesFilePath.string(), ios::app);
 						quotesFile << join_strings_with(cmd.params, " ") << endl;
 					}
-				});
+				}, addMustBeManagement, addMustBeSubscriber);
 			}
 		}
 		else if (commandType.compare("counter") == 0)
@@ -204,10 +239,13 @@ namespace vanguard {
 				replace_with_in("$CHANNELNAME", mChannelName, msg);
 				replace_with_in("$USERNAME", inCommand.userName, msg);
 				send_chat_message(msg);
-			});
+			}, mustBeManagement, mustBeSubscriber);
 			
 			if( addCommandName.length() > 0 )
 			{
+				bool addMustBeManagement = tolower(commandInfo.value_for_key("incrementCommandMustBeManagement")) == "true";
+				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("incrementCommandMustBeSubscriber")) == "true";
+
 				add_bot_command_handler(addCommandName, [this, quotesFilePath, incrementResponse](irc_command inCommand)
 										{
 					size_t currentCount = 0;
@@ -229,7 +267,7 @@ namespace vanguard {
 					replace_with_in("$CHANNELNAME", mChannelName, msg);
 					replace_with_in("$USERNAME", inCommand.userName, msg);
 					send_chat_message(msg);
-				});
+				}, addMustBeManagement, addMustBeSubscriber);
 			}
 		}
 	}
@@ -411,24 +449,35 @@ namespace vanguard {
 		handle_command(command);
 	}
 	
-	
 	void	vanguardbot::handle_command(const irc_command& inCommand)
 	{
-		map<string, irc_command_handler>::iterator foundHandler = mProtocolCommandHandlers.find(inCommand.command);
-		if (foundHandler != mProtocolCommandHandlers.end())
+		map<string, irc_command_handler>::iterator foundProtocolHandler = mProtocolCommandHandlers.find(inCommand.command);
+		if (foundProtocolHandler != mProtocolCommandHandlers.end())
 		{
-			foundHandler->second(inCommand);
+			foundProtocolHandler->second(inCommand);
 		}
 		else if (inCommand.command.compare("PRIVMSG") == 0 && inCommand.params.size() > 1)
 		{
+			string userName(tolower(inCommand.userName));
+			cout << "User State: " << userName << ":\n";
+			map<string,string>& userTags = mUserTags[userName];
+			
+			userTags["badges"] = field_from_map("badges", inCommand.tags);
+			userTags["color"] = field_from_map("color", inCommand.tags);
+
+			cout << "User State: " << userName << ":\n";
+			for( auto tagPair : userTags )
+			{
+				cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
+			}
+
 			if( mEverSeenUsers.find(tolower(inCommand.userName)) == mEverSeenUsers.end() )
 			{
 				mTodaySeenUsers.insert(inCommand.userName);
 				mEverSeenUsers.insert(inCommand.userName);
+				ofstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::app);
+				everSeenUsers << inCommand.userName.c_str() << endl;
 				mEverSeenUserHandler(inCommand.userName);
-				ofstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::out | ios_base::ate);
-				everSeenUsers.write(inCommand.userName.c_str(), inCommand.userName.length());
-				everSeenUsers.write("\n", 1);
 			}
 			else if( mTodaySeenUsers.find(tolower(inCommand.userName)) == mTodaySeenUsers.end() )
 			{
@@ -451,43 +500,47 @@ namespace vanguard {
 					botCommand.params.push_back(paramsStr.substr(partSeparatorOffset + 1, paramsStr.length() - (partSeparatorOffset - 1)));
 				}
 				
-				map<string, irc_command_handler>::iterator foundHandler = mBotCommandHandlers.find(botCommand.command);
-				if (foundHandler != mBotCommandHandlers.end())
+				map<string, bot_command_handler_entry>::iterator foundHandler = mBotCommandHandlers.find(botCommand.command);
+				if (foundHandler != mBotCommandHandlers.end()
+					&& (!foundHandler->second.mustBeSubscriber || userTags["subscriber"] == "1")
+					&& (!foundHandler->second.mustBeManagement || userTags[";management"] == "1"))
 				{
-					foundHandler->second(botCommand);
+					foundHandler->second.handler(botCommand);
 				}
 				else
 				{
 					foundHandler = mBotCommandHandlers.find("*");
-					if (foundHandler != mBotCommandHandlers.end())
+					if (foundHandler != mBotCommandHandlers.end()
+						&& (!foundHandler->second.mustBeSubscriber || userTags["subscriber"] == "1")
+						&& (!foundHandler->second.mustBeManagement || userTags[";management"] == "1"))
 					{
-						foundHandler->second(botCommand);
+						foundHandler->second.handler(botCommand);
 					}
 					else
 					{
-						foundHandler = mProtocolCommandHandlers.find("*");
-						if (foundHandler != mProtocolCommandHandlers.end())
+						foundProtocolHandler = mProtocolCommandHandlers.find("*");
+						if (foundProtocolHandler != mProtocolCommandHandlers.end())
 						{
-							foundHandler->second(inCommand);
+							foundProtocolHandler->second(inCommand);
 						}
 					}
 				}
 			}
 			else
 			{
-				foundHandler = mProtocolCommandHandlers.find("*");
-				if (foundHandler != mProtocolCommandHandlers.end())
+				foundProtocolHandler = mProtocolCommandHandlers.find("*");
+				if (foundProtocolHandler != mProtocolCommandHandlers.end())
 				{
-					foundHandler->second(inCommand);
+					foundProtocolHandler->second(inCommand);
 				}
 			}
 		}
 		else
 		{
-			foundHandler = mProtocolCommandHandlers.find("*");
-			if (foundHandler != mProtocolCommandHandlers.end())
+			foundProtocolHandler = mProtocolCommandHandlers.find("*");
+			if (foundProtocolHandler != mProtocolCommandHandlers.end())
 			{
-				foundHandler->second(inCommand);
+				foundProtocolHandler->second(inCommand);
 			}
 		}
 	}

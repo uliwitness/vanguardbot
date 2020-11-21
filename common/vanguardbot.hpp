@@ -21,10 +21,15 @@ namespace vanguard {
 		map<string,string> 	tags;
 	};
 	
-	
 	typedef function<void(const irc_command&)> irc_command_handler;
 	typedef function<void(const string&)> seen_user_handler;
 
+	struct bot_command_handler_entry {
+		irc_command_handler handler;
+		bool mustBeManagement;
+		bool mustBeSubscriber;
+	};
+	
 	
 	class vanguardbot : public vanguardbot_base
 	{
@@ -41,7 +46,7 @@ namespace vanguard {
 		/*! Bot commands are things like "!quote". or "!addquote What are you doing".
 			Specify the name without the exclamation mark, specify "*" to be called
 			for every bot command for which no handler exists. */
-		void	add_bot_command_handler(const string& name, irc_command_handler handler) { mBotCommandHandlers[tolower(name)] = handler; };
+		void	add_bot_command_handler(const string& name, irc_command_handler handler, bool mustBeManagement, bool mustBeSubscriber) { mBotCommandHandlers[tolower(name)] = bot_command_handler_entry{ .handler = handler, .mustBeManagement = mustBeManagement, .mustBeSubscriber = mustBeSubscriber }; };
 		
 		//! Protocol commands are IRC's internal commands, like PRIVMSG or PING.
 		void	add_protocol_command_handler(string name, irc_command_handler handler) { mProtocolCommandHandlers[name] = handler; };
@@ -66,15 +71,17 @@ namespace vanguard {
 		
 		irc_command		apply_pattern_to_command(const string& pattern, const irc_command &inCommand);
 		
-		string								mCommandsFolderPath;
-		string								mChannelName;
-		string								mUserName;
-		map<string, irc_command_handler>	mProtocolCommandHandlers;
-		map<string, irc_command_handler>	mBotCommandHandlers;
-		set<string>							mTodaySeenUsers;
-		seen_user_handler					mTodaySeenUserHandler;
-		set<string>							mEverSeenUsers;
-		seen_user_handler					mEverSeenUserHandler;
+		string									mCommandsFolderPath; //!< Folder containing commands and data.
+		string									mChannelName; //!< Name of the stream channel.
+		string									mUserName; //!< Name of the bot user.
+		map<string, irc_command_handler>		mProtocolCommandHandlers;
+		map<string, bot_command_handler_entry>	mBotCommandHandlers;
+		set<string>								mTodaySeenUsers; //!< Usernames.
+		seen_user_handler						mTodaySeenUserHandler;
+		set<string>								mEverSeenUsers; //!< Usernames.
+		seen_user_handler						mEverSeenUserHandler;
+		map<string, map<string, string>>		mUserTags;	//!< Username -> tags map.
+		map<string, string>						mRoomTags;	//!< Tag name -> value map.
 	};
 	
 }

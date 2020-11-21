@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "vanguardbot.hpp"
-
+#import <UserNotifications/UserNotifications.h>
 
 using namespace vanguard;
 
@@ -27,7 +27,7 @@ using namespace vanguard;
 @property (weak) IBOutlet NSProgressIndicator *progress;
 @property (weak) IBOutlet NSTableView *eventsList;
 
-@property (strong) NSMutableArray *events;
+@property (strong) NSMutableArray<NSAttributedString *> *events;
 
 @end
 
@@ -39,14 +39,43 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	[self.events addObject: message];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	[self.events addObject: attrMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
+	[self.eventsList.window display];
 }
+
+- (void) logMinor: (NSString*)format, ...
+{
+	va_list list = {};
+	va_start(list, format);
+	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
+	va_end(list);
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	[self.events addObject: attrMsg];
+	[self.eventsList noteNumberOfRowsChanged];
+	[self.eventsList scrollRowToVisible: self.events.count -1];
+	[self.eventsList.window display];
+}
+
+- (void) logUserEvent: (NSString*)format, ...
+{
+	va_list list = {};
+	va_start(list, format);
+	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
+	va_end(list);
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemTealColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	[self.events addObject: attrMsg];
+	[self.eventsList noteNumberOfRowsChanged];
+	[self.eventsList scrollRowToVisible: self.events.count -1];
+	[self.eventsList.window display];
+}
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	self.events = [@[@"Launched."] mutableCopy];
+	self.events = [NSMutableArray new];
 	[self.eventsList reloadData];
 	
 	[self.progress startAnimation: nil];
@@ -57,7 +86,7 @@ using namespace vanguard;
 	
 	if( ![NSFileManager.defaultManager fileExistsAtPath: commandsFolder] )
 	{
-		[self log: @"Creating commands folder at \"%@\"", commandsFolder];
+		[self logMinor: @"Creating commands folder at \"%@\"", commandsFolder];
 		NSURL * exampleCommandsURL = [NSBundle.mainBundle URLForResource: @"example_commands" withExtension: nil subdirectory: nil];
 		[NSFileManager.defaultManager copyItemAtURL: exampleCommandsURL toURL: commandsFolderURL error: NULL];
 	}
@@ -93,13 +122,17 @@ using namespace vanguard;
 	}
 	
 	[self.progress stopAnimation: nil];
+	
+	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions: UNAuthorizationOptionAlert | UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError *__nullable error) { NSLog(@"%s: %@", granted ? "Granted" : "NOT GRANTED", error); }];
+	
+	[self logMinor: @"Launched."];
 }
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
 	[self.progress startAnimation: nil];
-	[self log: @"Signing off..."];
+	[self logMinor: @"Signing off..."];
 
 	mBot.log_out();
 	
@@ -122,13 +155,13 @@ using namespace vanguard;
 	[NSUserDefaults.standardUserDefaults setObject: channelName forKey:@"VGBChannelName"];
 
 	self.connectButton.enabled = YES;
-	[self log: @"Done."];
+	[self logMinor: @"Done."];
 	[self.progress stopAnimation: nil];
 }
 
 - (IBAction)connectToServer:(id)sender
 {
-	[self log: @"Connecting..."];
+	[self logMinor: @"Connecting..."];
 	[self.progress startAnimation: nil];
 
 	NSString *commandsFolder = self.commandsFolderField.URL.path;
@@ -136,12 +169,22 @@ using namespace vanguard;
 	mBot.set_ever_seen_user_handler([self](const string& userName)
 									{
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
-		[self log: @"NEW USER! %@", userNameObjC];
+		[self logUserEvent: @"New user %@", userNameObjC];
+
+		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
+		content.body = userNameObjC;
+		UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier: @"com.thevoidsoftware.userseen.ever" content: content trigger: nil];
+		[UNUserNotificationCenter.currentNotificationCenter addNotificationRequest: request withCompletionHandler: nil];
 	});
 	mBot.set_today_seen_user_handler([self](const string& userName)
 									{
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
-		[self log: @"RETURNING USER! %@", userNameObjC];
+		[self logUserEvent: @"Returning user %@", userNameObjC];
+
+		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
+		content.body = userNameObjC;
+		UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier: @"com.thevoidsoftware.userseen.ever" content: content trigger: nil];
+		[UNUserNotificationCenter.currentNotificationCenter addNotificationRequest: request withCompletionHandler: nil];
 	});
 	mBot.connect("irc.chat.twitch.tv", 6667, commandsFolder.fileSystemRepresentation, [self]()
 				 {

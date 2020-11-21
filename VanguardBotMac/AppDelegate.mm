@@ -10,6 +10,9 @@
 #import "vanguardbot.hpp"
 
 
+using namespace vanguard;
+
+
 @interface AppDelegate ()
 {
 	vanguardbot mBot;
@@ -30,6 +33,13 @@
 	NSString *commandsFolder = [@"~/Library/Application Support/vanguardbot" stringByExpandingTildeInPath];
 	NSURL *commandsFolderURL = [NSURL fileURLWithPath:commandsFolder];
 	self.commandsFolderField.URL = commandsFolderURL;
+	
+	if( ![NSFileManager.defaultManager fileExistsAtPath: commandsFolder] )
+	{
+		NSLog(@"Creating commands folder.");
+		NSURL * exampleCommandsURL = [NSBundle.mainBundle URLForResource: @"example_commands" withExtension: nil subdirectory: nil];
+		[NSFileManager.defaultManager copyItemAtURL: exampleCommandsURL toURL: commandsFolderURL error: NULL];
+	}
 
 	NSString * userName = [NSUserDefaults.standardUserDefaults objectForKey: @"VGBUserName"];
 	if( userName )

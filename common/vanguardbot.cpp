@@ -8,7 +8,9 @@
 #include "fake_filesystem.hpp"
 #endif
 #include <fstream>
+#include "string_utils.hpp"
 
+namespace vanguard {
 
 using namespace std;
 
@@ -147,44 +149,6 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 }
 
 
-void replace_with_in(string pattern, string replacement, string &target)
-{
-	size_t currPos = 0;
-	while(currPos < target.length())
-	{
-		size_t foundPos = target.find(pattern, currPos);
-		if (foundPos == string::npos)
-		{
-			return;
-		}
-		
-		target.replace(foundPos, pattern.length(), replacement);
-		currPos = foundPos + replacement.length();
-	}
-}
-
-
-vector<string>	split_string_at(string inTarget, string splitter)
-{
-	vector<string> result;
-	
-	size_t currPos = 0;
-	while (currPos < inTarget.length())
-	{
-		size_t separatorPos = inTarget.find(splitter, currPos);
-		if (separatorPos == string::npos)
-		{
-			separatorPos = inTarget.length();
-		}
-		result.push_back(inTarget.substr(currPos, separatorPos - currPos));
-		
-		currPos = separatorPos + splitter.length();
-	}
-	
-	return result;
-}
-
-
 irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const irc_command &inCommand)
 {
 	irc_command		tempCommand = inCommand;
@@ -272,7 +236,7 @@ void	vanguardbot::send_chat_message(string msg)
 }
 
 
-void	vanguardbot::process_one_line(string currLine)
+void	vanguardbot::process_one_line(const string& currLine)
 {
 	string currMessage(currLine);
 	irc_command command;
@@ -373,7 +337,7 @@ void	vanguardbot::handle_command(const irc_command& inCommand)
 			if (partSeparatorOffset == string::npos)
 				partSeparatorOffset = paramsStr.length();
 			
-			botCommand.command = paramsStr.substr(1, partSeparatorOffset - 1);
+			botCommand.command = tolower(paramsStr.substr(1, partSeparatorOffset - 1));
 			if ((partSeparatorOffset + 1) < paramsStr.length())
 			{
 				botCommand.params.push_back(paramsStr.substr(partSeparatorOffset + 1, paramsStr.length() - (partSeparatorOffset - 1)));
@@ -472,3 +436,5 @@ void	vanguardbot::log_out()
 	
 	send_message("QUIT :bot is shutting down.");
 }
+
+} /* namespace vanguard */

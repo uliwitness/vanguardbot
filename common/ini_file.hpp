@@ -5,20 +5,25 @@
 #include <map>
 
 
-class ini_file
-{
-public:
-	ini_file(const std::string& inFilePath);
-	~ini_file();
-
-	std::string value_for_key(const std::string& inKey) { return mSettings[inKey]; }
-	void		set_key_to_value(const std::string& inKey, const std::string& inValue) { mSettings[inKey] = inValue; }
-
-	void		save();
-
-protected:
-	std::string							mFilePath;
-	bool								mModified = false;
-	std::map<std::string, std::string>	mSettings;
-};
-
+namespace vanguard {
+	
+	using namespace std;
+	
+	class ini_file
+	{
+	public:
+		ini_file(const string& inFilePath);
+		~ini_file();
+		
+		string value_for_key(const string& inKey) { return mSettings[inKey]; }
+		void		set_key_to_value(const string& inKey, const string& inValue) { mSettings[inKey] = inValue; }
+		
+		void		save();
+		
+	protected:
+		string				mFilePath;
+		bool				mModified = false;
+		map<string, string>	mSettings;
+	};
+	
+}

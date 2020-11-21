@@ -688,7 +688,7 @@
             </items>
             <point key="canvasLocation" x="136" y="-14"/>
         </menu>
-        <window title="VanguardBotMac" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="VanguardBotMac" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="VGBMainWindow" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="370"/>
@@ -767,7 +767,8 @@
                                 <constraint firstItem="6q5-6R-Rrb" firstAttribute="top" secondItem="SDB-mF-5hB" secondAttribute="top" id="tNO-rO-K8v"/>
                             </constraints>
                         </view>
-                        <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="borderColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="fillColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lSG-zH-gw1">
                         <rect key="frame" x="381" y="191" width="86" height="32"/>

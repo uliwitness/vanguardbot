@@ -75,7 +75,7 @@ using namespace vanguard;
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
 	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
-	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	[fullMsg appendAttributedString: attrMsg];
 	[self.events addObject: fullMsg];
@@ -91,7 +91,7 @@ using namespace vanguard;
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
 	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
-	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	NSFont * font = [NSFontManager.sharedFontManager convertFont: [NSFont systemFontOfSize: 18.0] toHaveTrait: NSItalicFontMask];
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: font }];
 	[fullMsg appendAttributedString: attrMsg];
@@ -101,14 +101,24 @@ using namespace vanguard;
 	[self.eventsList.window display];
 }
 
-- (void) logUserEvent: (NSString*)format, ...
+- (void) logUser: (nullable NSString*)label event: (NSString*)format, ...
 {
 	va_list list = {};
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemTealColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
-	[self.events addObject: attrMsg];
+	NSString * timestamp = [NSString stringWithFormat: @"%@ ", self.currentTime];
+	NSMutableAttributedString * fullMsg = [[NSMutableAttributedString alloc] initWithString: timestamp attributes: @{ NSForegroundColorAttributeName: NSColor.systemIndigoColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlAccentColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
+	[fullMsg appendAttributedString: attrMsg];
+	
+	if (label != nil)
+	{
+		NSAttributedString * attrLabel = [[NSAttributedString alloc] initWithString: [@" " stringByAppendingString: label] attributes: @{ NSForegroundColorAttributeName: NSColor.controlAccentColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: 18.0] }];
+		[fullMsg appendAttributedString: attrLabel];
+	}
+
+	[self.events addObject: fullMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
 	[self.eventsList.window display];
@@ -208,7 +218,7 @@ using namespace vanguard;
 	mBot.set_ever_seen_user_handler([self](const string& userName)
 									{
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
-		[self logUserEvent: @"New user %@", userNameObjC];
+		[self logUser: userNameObjC event: @"New user"];
 
 		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
 		content.body = [NSString stringWithFormat: @"New user \"%@\"", userNameObjC];
@@ -218,7 +228,7 @@ using namespace vanguard;
 	mBot.set_today_seen_user_handler([self](const string& userName)
 									{
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
-		[self logUserEvent: @"Returning user %@", userNameObjC];
+		[self logUser: userNameObjC event: @"Returning user"];
 
 		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
 		content.body = [NSString stringWithFormat: @"Returning user \"%@\"", userNameObjC];

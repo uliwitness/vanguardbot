@@ -17,7 +17,9 @@
             <connections>
                 <outlet property="channelNameField" destination="Oex-ZN-n0v" id="GaA-db-I0H"/>
                 <outlet property="commandsFolderField" destination="6q5-6R-Rrb" id="XQC-KW-Pje"/>
+                <outlet property="connectButton" destination="lSG-zH-gw1" id="0hE-Ti-ErQ"/>
                 <outlet property="passwordField" destination="l9E-4Y-yP7" id="qFJ-Pz-Ltu"/>
+                <outlet property="progress" destination="lbf-cE-mpt" id="EHu-cu-5yV"/>
                 <outlet property="userNameField" destination="lI1-Zt-sJQ" id="XUx-cS-ixL"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -690,8 +692,8 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
-            <view key="contentView" wantsLayer="YES" misplaced="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
+            <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="480" height="192"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="240" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Uyu-c8-NKc">
@@ -784,6 +786,9 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <progressIndicator maxValue="100" displayedWhenStopped="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="lbf-cE-mpt">
+                        <rect key="frame" x="364" y="22" width="16" height="16"/>
+                    </progressIndicator>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Uyu-c8-NKc" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" symbolic="YES" id="3Cg-K1-wi4"/>
@@ -812,6 +817,8 @@
                     <constraint firstItem="l9E-4Y-yP7" firstAttribute="height" secondItem="lI1-Zt-sJQ" secondAttribute="height" id="sOW-za-dTq"/>
                     <constraint firstAttribute="trailing" secondItem="Oex-ZN-n0v" secondAttribute="trailing" constant="20" symbolic="YES" id="scz-Yv-wea"/>
                     <constraint firstItem="lI1-Zt-sJQ" firstAttribute="baseline" secondItem="Uyu-c8-NKc" secondAttribute="baseline" id="tyc-wz-Lb8"/>
+                    <constraint firstItem="lSG-zH-gw1" firstAttribute="centerY" secondItem="lbf-cE-mpt" secondAttribute="centerY" id="u5e-Oi-il2"/>
+                    <constraint firstItem="lSG-zH-gw1" firstAttribute="leading" secondItem="lbf-cE-mpt" secondAttribute="trailing" constant="8" symbolic="YES" id="uRW-Xy-6au"/>
                     <constraint firstItem="VSa-Ok-Uuy" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" symbolic="YES" id="uuM-hn-mW6"/>
                     <constraint firstItem="Oex-ZN-n0v" firstAttribute="leading" secondItem="BRU-In-oxc" secondAttribute="trailing" constant="8" symbolic="YES" id="vut-Xt-Cg3"/>
                     <constraint firstItem="u0S-Ko-U3S" firstAttribute="centerY" secondItem="f2Y-od-ozm" secondAttribute="centerY" id="yrd-Rg-fij"/>

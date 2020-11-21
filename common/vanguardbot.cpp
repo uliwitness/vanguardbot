@@ -141,7 +141,7 @@ void	vanguardbot::load_one_command_folder(const string &inCommandFolder)
 										if (cmd.params.size() > 0 && cmd.params[0].length() > 0)
 										{
 											ofstream quotesFile(quotesFilePath.string(), ios::app);
-											quotesFile << cmd.params[0] << endl;
+											quotesFile << join_strings_with(cmd.params, " ") << endl;
 										}
 									});
 		}
@@ -176,7 +176,7 @@ irc_command	vanguardbot::apply_pattern_to_command(const string& pattern, const i
 				string patternToMatch = pattern.substr(currPos, patternToMatchEndOffs - currPos);
 				
 				currPos = patternToMatchEndOffs + 1;
-				string paramsStr = (inCommand.params.size() > 0) ? inCommand.params[0] : "";
+				string paramsStr = join_strings_with(inCommand.params, " ");
 				
 				time_t rawtime;
 				time( &rawtime );

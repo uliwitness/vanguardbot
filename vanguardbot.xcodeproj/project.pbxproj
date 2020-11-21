@@ -59,6 +59,7 @@
 		5577303020F134450006784D /* string_utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = string_utils.cpp; sourceTree = "<group>"; };
 		5577303120F134450006784D /* string_utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = string_utils.hpp; sourceTree = "<group>"; };
 		5582256C25691DAF00988E88 /* example_commands */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = example_commands; path = common/example_commands; sourceTree = SOURCE_ROOT; };
+		55822570256925C700988E88 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +83,7 @@
 		556B380A20E98158000159A4 = {
 			isa = PBXGroup;
 			children = (
+				55822570256925C700988E88 /* README.md */,
 				556B382320E9833E000159A4 /* common */,
 				556B381520E98158000159A4 /* macos */,
 				5577301C20F054610006784D /* VanguardBotMac */,

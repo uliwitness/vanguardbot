@@ -19,6 +19,8 @@ namespace vanguard {
 
 	vector<string>	split_string_at(const string& inTarget, const string& splitter);
 
+	string join_strings_with(const vector<string>& strings, const string& separator);
+
 	string tolower(const string& inString);
 
 }

@@ -219,6 +219,12 @@ using namespace vanguard;
 	
 	mBot.set_ever_seen_user_handler([self](const string& userName)
 									{
+		if( tolower(userName) == tolower(mBot.channelName())
+		   || tolower(userName) == tolower(mBot.userName()) )
+		{
+			return;
+		}
+		
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
 		[self logUser: userNameObjC event: @"New user"];
 
@@ -229,6 +235,12 @@ using namespace vanguard;
 	});
 	mBot.set_today_seen_user_handler([self](const string& userName)
 									{
+		if( tolower(userName) == tolower(mBot.channelName())
+		   || tolower(userName) == tolower(mBot.userName()) )
+		{
+			return;
+		}
+
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
 		[self logUser: userNameObjC event: @"Returning user"];
 
@@ -269,6 +281,8 @@ using namespace vanguard;
 		self.connectButton.enabled = NO;
 		[self.progress stopAnimation: nil];
 		[self.loginPanel setHidden: YES];
+		
+		[self.eventsList.window setTitle: [NSString stringWithFormat: @"#%@ • @%@", channelName, userName]];
 	});
 }
 

@@ -488,7 +488,7 @@ namespace vanguard {
 			irc_command botCommand = inCommand;
 			botCommand.params.clear();
 			string paramsStr(inCommand.params[1]);	// 0 is channel name.
-			if (paramsStr.length() > 1 && paramsStr[0] == '!')
+			if( paramsStr.length() > 1 && paramsStr[0] == '!' )
 			{
 				size_t partSeparatorOffset = paramsStr.find(" ");
 				if (partSeparatorOffset == string::npos)
@@ -518,20 +518,34 @@ namespace vanguard {
 					}
 					else
 					{
-						foundProtocolHandler = mProtocolCommandHandlers.find("*");
-						if (foundProtocolHandler != mProtocolCommandHandlers.end())
+						if( mPrivMsgHandler )
 						{
-							foundProtocolHandler->second(inCommand);
+							mPrivMsgHandler(inCommand);
+						}
+						else
+						{
+							foundProtocolHandler = mProtocolCommandHandlers.find("*");
+							if (foundProtocolHandler != mProtocolCommandHandlers.end())
+							{
+								foundProtocolHandler->second(inCommand);
+							}
 						}
 					}
 				}
 			}
 			else
 			{
-				foundProtocolHandler = mProtocolCommandHandlers.find("*");
-				if (foundProtocolHandler != mProtocolCommandHandlers.end())
+				if( mPrivMsgHandler )
 				{
-					foundProtocolHandler->second(inCommand);
+					mPrivMsgHandler(inCommand);
+				}
+				else
+				{
+					foundProtocolHandler = mProtocolCommandHandlers.find("*");
+					if (foundProtocolHandler != mProtocolCommandHandlers.end())
+					{
+						foundProtocolHandler->second(inCommand);
+					}
 				}
 			}
 		}

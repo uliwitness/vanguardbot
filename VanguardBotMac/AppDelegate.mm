@@ -33,13 +33,19 @@ using namespace vanguard;
 
 @implementation AppDelegate
 
-- (void) log: (NSString*)format, ...
+- (void) logLabel: (nullable NSString*)label format: (NSString*)format, ...
 {
 	va_list list = {};
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	if (label != nil)
+	{
+		NSMutableAttributedString * attrLabel = [[NSMutableAttributedString alloc] initWithString: [label stringByAppendingString: @": "] attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: NSFont.systemFontSize] }];
+		[attrLabel appendAttributedString: attrMsg];
+		attrMsg = attrLabel;
+	}
 	[self.events addObject: attrMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
@@ -186,6 +192,20 @@ using namespace vanguard;
 		UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier: @"com.thevoidsoftware.userseen.ever" content: content trigger: nil];
 		[UNUserNotificationCenter.currentNotificationCenter addNotificationRequest: request withCompletionHandler: nil];
 	});
+	mBot.set_privmsg_handler([self](irc_command command)
+							 {
+		NSString * msg = [NSString stringWithUTF8String: command.params[1].c_str()];
+		NSString * userNameObjC = [NSString stringWithUTF8String: command.userName.c_str()];
+		if( tolower(command.userName) == tolower(mBot.userName()) )
+		{
+			[self logMinor: @"%@: %@", userNameObjC, msg];
+		}
+		else
+		{
+			[self logLabel: userNameObjC format: @"%@", msg];
+		}
+	});
+	
 	mBot.connect("irc.chat.twitch.tv", 6667, commandsFolder.fileSystemRepresentation, [self]()
 				 {
 		NSString *userName = self.userNameField.stringValue;
@@ -194,7 +214,7 @@ using namespace vanguard;
 		mBot.log_in(userName.UTF8String, password.UTF8String, channelName.UTF8String);
 		mBot.run();
 		
-		[self log: @"Connected."];
+		[self logLabel: nil format: @"Connected."];
 		self.connectButton.enabled = NO;
 		[self.progress stopAnimation: nil];
 	});

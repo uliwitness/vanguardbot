@@ -82,3 +82,25 @@ The following `$`-words are recognized in this list of parameters:
 `$_` - All parameters given to this command.
 
 As you can see, the quote command can be quite powerful in Vanguardbot, and has many uses beyond just collecting quotes.
+
+### Counters
+
+A counter is a pair of commands, one of which displays a count, the other allows you incrementing the count
+by one. This is a fun way of letting your viewers interactively take part in your stream by keeping count of
+something, like how often you say "um", how often you burp, sneeze, die in a difficult game, or how rarely that
+happens. For example, if you wanted to create a death counter, you could create a command folder named
+`howdead` and put the following `info.ini` file into it:
+
+    type=counter
+    filename=deathcounter.txt
+    response=$CHANNELNAME has died $COUNT times.
+    incrementcommand=dead
+    incrementresponse=$CHANNELNAME is now at $COUNT deaths, my dear $USERNAME.
+
+The important part here is the `type=counter` so Vanguardbot knows this command is a counter. The `filename` is the file in the `data` folder in which the count will be kept between restarts. The `response` is the message that Vanguardbot will display to tell the viewer about the counter's count.
+
+The `incrementcommand` is the name of the command to use for incrementing the counter. In this case, that would be `!dead`. The `incrementresponse` is a message Vanguardbot will print to confirm that the counter has been incremented. You can write three placeholders in the responses:
+
+`$COUNT` - The count of the counter (in the case of incrementresponse, after incrementing)
+`$CHANNELNAME` - The name of this channel, and therefore the broadcaster of this stream.
+`$USERNAME` - The name of the user who invoked the counter command.

@@ -173,6 +173,65 @@ namespace vanguard {
 				});
 			}
 		}
+		else if (commandType.compare("counter") == 0)
+		{
+			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
+			
+			string	addCommandName = commandInfo.value_for_key("incrementcommand");
+			
+			string	quotesFileName = commandInfo.value_for_key("filename");
+			if (quotesFileName.empty())
+			{
+				quotesFileName = "counter.txt";
+			}
+			path	quotesFilePath(commandFolder.parent_path() / "data" / quotesFileName);
+			string	response = commandInfo.value_for_key("response");
+			string	incrementResponse = commandInfo.value_for_key("incrementresponse");
+
+			add_bot_command_handler(commandName, [this, quotesFilePath, response](irc_command inCommand)
+									{
+				size_t currentCount = 0;
+				ifstream quotesFile(quotesFilePath.string());
+				if (quotesFile.good())
+				{
+					char currLine[1024] = {};
+					quotesFile.getline(currLine, sizeof(currLine) - 1);
+					currentCount = atoll(currLine);
+				}
+				
+				string msg(response.empty() ? "The counter is at $COUNT." : response);
+				replace_with_in("$COUNT", to_string(currentCount), msg);
+				replace_with_in("$CHANNELNAME", mChannelName, msg);
+				replace_with_in("$USERNAME", inCommand.userName, msg);
+				send_chat_message(msg);
+			});
+			
+			if( addCommandName.length() > 0 )
+			{
+				add_bot_command_handler(addCommandName, [this, quotesFilePath, incrementResponse](irc_command inCommand)
+										{
+					size_t currentCount = 0;
+					ifstream quotesFile(quotesFilePath.string());
+					if (quotesFile.good())
+					{
+						char currLine[1024] = {};
+						quotesFile.getline(currLine, sizeof(currLine) - 1);
+						currentCount = atoll(currLine);
+					}
+
+					++currentCount;
+					
+					ofstream counterFile(quotesFilePath.string(), ios::trunc | ios::out);
+					counterFile << to_string(currentCount) << endl;
+					
+					string msg(incrementResponse.empty() ? "The counter has increased to $COUNT." : incrementResponse);
+					replace_with_in("$COUNT", to_string(currentCount), msg);
+					replace_with_in("$CHANNELNAME", mChannelName, msg);
+					replace_with_in("$USERNAME", inCommand.userName, msg);
+					send_chat_message(msg);
+				});
+			}
+		}
 	}
 	
 	

@@ -26,6 +26,7 @@ using namespace vanguard;
 @property (weak) IBOutlet NSButton *connectButton;
 @property (weak) IBOutlet NSProgressIndicator *progress;
 @property (weak) IBOutlet NSTableView *eventsList;
+@property (weak) IBOutlet NSView *loginPanel;
 
 @property (strong) NSMutableArray<NSAttributedString *> *events;
 
@@ -181,6 +182,7 @@ using namespace vanguard;
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
+	[self.loginPanel setHidden: NO];
 	[self.progress startAnimation: nil];
 	[self logMinor: @"Signing off..."];
 
@@ -266,6 +268,7 @@ using namespace vanguard;
 		
 		self.connectButton.enabled = NO;
 		[self.progress stopAnimation: nil];
+		[self.loginPanel setHidden: YES];
 	});
 }
 

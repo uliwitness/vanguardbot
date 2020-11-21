@@ -39,10 +39,10 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	if (label != nil)
 	{
-		NSMutableAttributedString * attrLabel = [[NSMutableAttributedString alloc] initWithString: [label stringByAppendingString: @": "] attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: NSFont.systemFontSize] }];
+		NSMutableAttributedString * attrLabel = [[NSMutableAttributedString alloc] initWithString: [label stringByAppendingString: @": "] attributes: @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont boldSystemFontOfSize: 18.0] }];
 		[attrLabel appendAttributedString: attrMsg];
 		attrMsg = attrLabel;
 	}
@@ -58,7 +58,7 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	[self.events addObject: attrMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
@@ -71,7 +71,7 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSFont * font = [NSFontManager.sharedFontManager convertFont: [NSFont systemFontOfSize: NSFont.systemFontSize] toHaveTrait: NSItalicFontMask];
+	NSFont * font = [NSFontManager.sharedFontManager convertFont: [NSFont systemFontOfSize: 18.0] toHaveTrait: NSItalicFontMask];
 	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: font }];
 	[self.events addObject: attrMsg];
 	[self.eventsList noteNumberOfRowsChanged];
@@ -85,7 +85,7 @@ using namespace vanguard;
 	va_start(list, format);
 	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
 	va_end(list);
-	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemTealColor, NSFontAttributeName: [NSFont systemFontOfSize: NSFont.systemFontSize] }];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemTealColor, NSFontAttributeName: [NSFont systemFontOfSize: 18.0] }];
 	[self.events addObject: attrMsg];
 	[self.eventsList noteNumberOfRowsChanged];
 	[self.eventsList scrollRowToVisible: self.events.count -1];
@@ -189,7 +189,7 @@ using namespace vanguard;
 		[self logUserEvent: @"New user %@", userNameObjC];
 
 		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
-		content.body = userNameObjC;
+		content.body = [NSString stringWithFormat: @"New user \"%@\"", userNameObjC];
 		UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier: @"com.thevoidsoftware.userseen.ever" content: content trigger: nil];
 		[UNUserNotificationCenter.currentNotificationCenter addNotificationRequest: request withCompletionHandler: nil];
 	});
@@ -199,7 +199,7 @@ using namespace vanguard;
 		[self logUserEvent: @"Returning user %@", userNameObjC];
 
 		UNMutableNotificationContent * content = [UNMutableNotificationContent new];
-		content.body = userNameObjC;
+		content.body = [NSString stringWithFormat: @"Returning user \"%@\"", userNameObjC];
 		UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier: @"com.thevoidsoftware.userseen.ever" content: content trigger: nil];
 		[UNUserNotificationCenter.currentNotificationCenter addNotificationRequest: request withCompletionHandler: nil];
 	});

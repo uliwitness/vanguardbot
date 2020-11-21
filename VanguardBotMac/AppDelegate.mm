@@ -65,6 +65,20 @@ using namespace vanguard;
 	[self.eventsList.window display];
 }
 
+- (void) logNotice: (NSString*)format, ...
+{
+	va_list list = {};
+	va_start(list, format);
+	NSString * message = [[NSString alloc] initWithFormat: format arguments: list];
+	va_end(list);
+	NSFont * font = [NSFontManager.sharedFontManager convertFont: [NSFont systemFontOfSize: NSFont.systemFontSize] toHaveTrait: NSItalicFontMask];
+	NSAttributedString * attrMsg = [[NSAttributedString alloc] initWithString: message attributes: @{ NSForegroundColorAttributeName: NSColor.systemGrayColor, NSFontAttributeName: font }];
+	[self.events addObject: attrMsg];
+	[self.eventsList noteNumberOfRowsChanged];
+	[self.eventsList scrollRowToVisible: self.events.count -1];
+	[self.eventsList.window display];
+}
+
 - (void) logUserEvent: (NSString*)format, ...
 {
 	va_list list = {};
@@ -130,8 +144,6 @@ using namespace vanguard;
 	[self.progress stopAnimation: nil];
 	
 	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions: UNAuthorizationOptionAlert | UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError *__nullable error) { NSLog(@"%s: %@", granted ? "Granted" : "NOT GRANTED", error); }];
-	
-	[self logMinor: @"Launched."];
 }
 
 
@@ -167,7 +179,6 @@ using namespace vanguard;
 
 - (IBAction)connectToServer:(id)sender
 {
-	[self logMinor: @"Connecting..."];
 	[self.progress startAnimation: nil];
 
 	NSString *commandsFolder = self.commandsFolderField.URL.path;
@@ -196,7 +207,9 @@ using namespace vanguard;
 							 {
 		NSString * msg = [NSString stringWithUTF8String: command.params[1].c_str()];
 		NSString * userNameObjC = [NSString stringWithUTF8String: command.userName.c_str()];
-		if( tolower(command.userName) == tolower(mBot.userName()) )
+		string posterName(tolower(command.userName));
+		if( posterName == tolower(mBot.userName())
+		   || posterName == tolower(mBot.channelName()))
 		{
 			[self logMinor: @"%@: %@", userNameObjC, msg];
 		}
@@ -205,7 +218,12 @@ using namespace vanguard;
 			[self logLabel: userNameObjC format: @"%@", msg];
 		}
 	});
-	
+	mBot.set_notice_handler([self](const string& notice)
+							 {
+		NSString * msg = [NSString stringWithUTF8String: notice.c_str()];
+		[self logNotice: @"%@", msg];
+	});
+
 	mBot.connect("irc.chat.twitch.tv", 6667, commandsFolder.fileSystemRepresentation, [self]()
 				 {
 		NSString *userName = self.userNameField.stringValue;
@@ -214,7 +232,6 @@ using namespace vanguard;
 		mBot.log_in(userName.UTF8String, password.UTF8String, channelName.UTF8String);
 		mBot.run();
 		
-		[self logLabel: nil format: @"Connected."];
 		self.connectButton.enabled = NO;
 		[self.progress stopAnimation: nil];
 	});

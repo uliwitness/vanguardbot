@@ -57,6 +57,9 @@ namespace vanguard {
 			off to this handler. */
 		void	set_privmsg_handler(irc_command_handler handler) { mPrivMsgHandler = handler; }
 		
+		/*! Status messages from the system are emitted to this handler. */
+		void	set_notice_handler(function<void(const string&)> handler) { mNoticeHandler = handler; }
+		
 		/*! Add a handler to be called the first time a user is seen since
 			the bot launched. This handler is only called when the
 			mEverSeenUsersHandler is not called. */
@@ -68,6 +71,7 @@ namespace vanguard {
 		void	set_ever_seen_user_handler(seen_user_handler handler) { mEverSeenUserHandler = handler; }
 		
 		string 	userName() { return mUserName; }
+		string 	channelName() { return mChannelName; }
 
 	protected:
 		void			load_one_command_folder(const string &inCommandFolder);
@@ -91,6 +95,7 @@ namespace vanguard {
 		map<string, map<string, string>>		mUserTags;	//!< Username -> tags map.
 		map<string, string>						mRoomTags;	//!< Tag name -> value map.
 		irc_command_handler						mPrivMsgHandler; //!< Handler we send your PrivMsg to if it wasn't a command.
+		function<void(const string&)>			mNoticeHandler;
 	};
 	
 }

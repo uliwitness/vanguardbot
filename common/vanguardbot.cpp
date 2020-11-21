@@ -52,17 +52,25 @@ namespace vanguard {
 			add_protocol_command_handler("PING", [this](irc_command inCommand)
 										 {
 				string pongMessage("PONG ");
-				if (inCommand.params.size() > 0)
+				if( inCommand.params.size() > 0 )
 				{
 					pongMessage.append(inCommand.params.front());
 				}
 				send_message(pongMessage);
 			});
 			
+			add_protocol_command_handler("NOTICE", [this](irc_command inCommand)
+										 {
+				if( inCommand.params.size() > 1 && mNoticeHandler )
+				{
+					mNoticeHandler(inCommand.params[1]);
+				}
+			});
+			
 			add_protocol_command_handler("*", [this](irc_command inCommand)
 										 {
 				cout << "Received: " << inCommand.userName << ": " << inCommand.command;
-				for (const string& currParam : inCommand.params)
+				for( const string& currParam : inCommand.params )
 				{
 					cout << " \"" << currParam << "\"";
 				}

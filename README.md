@@ -25,6 +25,10 @@ A Twitch chatbot that is supposed to be easy to manage, easy to update, flexible
 
 Right now the only working version of Vanguardbot is for **macOS**. I started creating a Visual Studio Solution for Windows, but can't get the entitlements to work. If anyone is more familiar with entitlements under Windows, help would be appreciated.
 
+## User List / Credits
+
+Vanguardbot keeps a `data/todayseenusers.txt` list of all users that have actively chatted, one username per line, that you can use to e.g. feed a credits text overlay at the end of your stream.
+
 ## Commands
 
 Commands are kept in a folder you specify to the server (By default, this is `~/Application Support/vanguardbot/` on macOS).
@@ -47,7 +51,7 @@ For example, if you wanted to have a "!joke" command in your channel, you could 
     filename=jokes.txt
     addcommand=addjoke
 
-### Name Pool
+### Name Pool / Queue 
 
 A name pool is a special form of the joke command. All names are kept in a text file. So for example, if you were doing a raffle in your stream and you wanted a "!draw" command to draw winners, and a "!join" command for them to join the raffle, you would create a `draw` folder containing the following `info.ini` file:
 

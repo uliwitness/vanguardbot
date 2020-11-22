@@ -10,24 +10,22 @@ A Twitch chatbot that is supposed to be easy to manage, easy to update, flexible
 - Unlimited number of joinable queues
 - Arbitrary names for "add quote" command
 - Notifications about first-time chatters (per stream, and ever)
+- Counters
+- Credits / active users list
+- Moderator-only commands
+- Timers that trigger messages or commands
 
 ## Planned Features
 
-- Counters
 - Command groups
 - Commands for setting the game and stream title on Twitch based on presets
 - Setup GUI for creating commands
 - Working Windows support
-- Moderator-only commands
 - Built-in OAuth login support (at least for GUI)
 
 ## Operating Systems
 
 Right now the only working version of Vanguardbot is for **macOS**. I started creating a Visual Studio Solution for Windows, but can't get the entitlements to work. If anyone is more familiar with entitlements under Windows, help would be appreciated.
-
-## User List / Credits
-
-Vanguardbot keeps a `data/todayseenusers.txt` list of all users that have actively chatted, one username per line, that you can use to e.g. feed a credits text overlay at the end of your stream.
 
 ## Commands
 
@@ -124,3 +122,7 @@ You could also set up a `hydrate` quote command that shows a random hydration me
     message=!hydrate
 
 The cool thing here is that timers know about commands and will not actually send a "!hydrate" message to Twitch chat. It will just internally pretend that it received this message and show the output from the command (in this case from `!hydrate`).
+
+### User List / Credits
+
+Vanguardbot keeps a `data/todayseenusers.txt` list of all users that have actively chatted, one username per line, that you can use to e.g. feed a credits text overlay at the end of your stream.

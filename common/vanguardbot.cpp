@@ -28,7 +28,8 @@ namespace vanguard {
 	void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	{
 		mCommandsFolderPath = inFolderPath;
-		
+		ofstream todaySeenUsers(mCommandsFolderPath + "/data/todayseenusers.txt", ios_base::trunc);
+
 		ifstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::in);
 		mEverSeenUsers.erase(mEverSeenUsers.begin(), mEverSeenUsers.end());
 		char buffer[1024] = {};
@@ -504,18 +505,29 @@ namespace vanguard {
 				cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
 			}
 
-			if( mEverSeenUsers.find(tolower(inCommand.userName)) == mEverSeenUsers.end() )
+			string currUser(tolower(inCommand.userName));
+			if( mEverSeenUsers.find(currUser) == mEverSeenUsers.end() )
 			{
 				mTodaySeenUsers.insert(inCommand.userName);
 				mEverSeenUsers.insert(inCommand.userName);
 				ofstream everSeenUsers(mCommandsFolderPath + "/data/seenusers.txt", ios_base::app);
-				everSeenUsers << inCommand.userName.c_str() << endl;
-				mEverSeenUserHandler(inCommand.userName);
+				everSeenUsers << inCommand.userName << endl;
+				if(currUser != tolower(mUserName) && currUser != tolower(mChannelName))
+				{
+					ofstream todaySeenUsers(mCommandsFolderPath + "/data/todayseenusers.txt", ios_base::app);
+					todaySeenUsers << inCommand.userName << endl;
+					mEverSeenUserHandler(inCommand.userName);
+				}
 			}
 			else if( mTodaySeenUsers.find(tolower(inCommand.userName)) == mTodaySeenUsers.end() )
 			{
 				mTodaySeenUsers.insert(inCommand.userName);
-				mTodaySeenUserHandler(inCommand.userName);
+				if(currUser != tolower(mUserName) && currUser != tolower(mChannelName))
+				{
+					ofstream todaySeenUsers(mCommandsFolderPath + "/data/todayseenusers.txt", ios_base::app);
+					todaySeenUsers << inCommand.userName << endl;
+					mTodaySeenUserHandler(inCommand.userName);
+				}
 			}
 			
 			irc_command botCommand = inCommand;
@@ -638,11 +650,18 @@ namespace vanguard {
 	
 	void	vanguardbot::log_out()
 	{
+		if( mChannelName.empty() )
+		{
+			return; // We were never logged in.
+		}
+		
 		string partMsg("PART #");
 		partMsg.append(mChannelName);
 		send_message(partMsg);
 		
 		send_message("QUIT :bot is shutting down.");
+		
+		mChannelName.erase();
 	}
 	
 } /* namespace vanguard */

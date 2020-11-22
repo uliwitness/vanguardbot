@@ -176,7 +176,13 @@ using namespace vanguard;
 	
 	[self.progress stopAnimation: nil];
 	
-	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions: UNAuthorizationOptionAlert | UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError *__nullable error) { NSLog(@"%s: %@", granted ? "Granted" : "NOT GRANTED", error); }];
+	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions: UNAuthorizationOptionAlert | UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError *__nullable error)
+	{
+		if (!granted)
+		{
+			NSLog(@"Notification permission not granted: %@", error);
+		}
+	}];
 }
 
 
@@ -219,12 +225,6 @@ using namespace vanguard;
 	
 	mBot.set_ever_seen_user_handler([self](const string& userName)
 									{
-		if( tolower(userName) == tolower(mBot.channelName())
-		   || tolower(userName) == tolower(mBot.userName()) )
-		{
-			return;
-		}
-		
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
 		[self logUser: userNameObjC event: @"New user"];
 
@@ -235,12 +235,6 @@ using namespace vanguard;
 	});
 	mBot.set_today_seen_user_handler([self](const string& userName)
 									{
-		if( tolower(userName) == tolower(mBot.channelName())
-		   || tolower(userName) == tolower(mBot.userName()) )
-		{
-			return;
-		}
-
 		NSString* userNameObjC = [NSString stringWithUTF8String: userName.c_str()];
 		[self logUser: userNameObjC event: @"Returning user"];
 

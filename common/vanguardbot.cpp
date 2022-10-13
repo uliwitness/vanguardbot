@@ -46,7 +46,7 @@ namespace vanguard {
 			}
 		}
 		
-		vanguardbot_base::connect(inHostname, inPortNumber, inFolderPath, [inReadyToRunHandler, this, inFolderPath]()
+		vanguardbot_base::connect(inHostname, inPortNumber, [inReadyToRunHandler, this, inFolderPath]()
 								  {
 			srand((unsigned)time(NULL));
 			
@@ -392,7 +392,6 @@ namespace vanguard {
 		externalChatCommand.append(chatCommand);
 		process_one_line(externalChatCommand);
 	}
-	
 	
 	void	vanguardbot::process_one_line(const string& currLine)
 	{

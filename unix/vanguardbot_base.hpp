@@ -2,26 +2,47 @@
 
 #include <string>
 #include <functional>
+#include <chrono>
 
 
-class vanguardbot_base
-{
-public:
-	vanguardbot_base() {}
-	virtual ~vanguardbot_base();
+namespace vanguard {
 
-	virtual void	connect(const std::string &inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler);
+    using namespace std;
 
-	void	send_message(std::string inMessage);
+    class vanguardbot_base {
+    public:
+        vanguardbot_base() {}
 
-	void	run();
+        virtual ~vanguardbot_base();
 
-protected:
-	virtual void	process_full_lines() = 0;
-	virtual void	log_in(std::string userName, std::string password, std::string channelName) = 0;
+        virtual void
+        connect(const std::string &inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler);
 
-	bool			mKeepRunning = true;
-	std::string		mMessageBuffer;
-	int				mSocket = -1;
-};
+        void send_message(std::string inMessage);
 
+        void run();
+
+        void perform_after(chrono::minutes delay, bool repeat, function<void()> handler);
+
+    protected:
+        struct TimerEntry {
+            chrono::steady_clock::time_point mNextFireTime;
+            function<void()> mHandler;
+            bool mRepeat;
+            chrono::seconds mDelay;
+        };
+
+        virtual void process_full_lines() = 0;
+
+        virtual void log_in(std::string userName, std::string password, std::string channelName) = 0;
+
+        chrono::seconds next_timer_fire_interval();
+        void fire_expired_timers();
+
+        bool mKeepRunning = true;
+        std::string mMessageBuffer;
+        int mSocket = -1;
+        std::vector<TimerEntry> mTimers;
+    };
+
+} /* vanguard */

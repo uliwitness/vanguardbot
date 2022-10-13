@@ -2,7 +2,7 @@
 #include "vanguardbot.hpp"
 
 using namespace std;
-
+using namespace vanguard;
 
 int main(int argc, const char* *argv)
 {
@@ -26,7 +26,7 @@ int main(int argc, const char* *argv)
 	}
 
 	vanguardbot	bot;
-	bot.connect("irc.chat.twitch.tv", 6667, commandsFolder, []()
+	bot.connect("irc.chat.twitch.tv", 6667, commandsFolder, [&bot, userName, password, channel]()
 	{
 		bot.log_in(userName, password, channel);
 		bot.run();

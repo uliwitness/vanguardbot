@@ -18,7 +18,7 @@ namespace vanguard {
         // Resolve host name into IP:
         hostent *hostname = gethostbyname(inHostname.c_str());
         if (!hostname) {
-            cout << "Function failed with error: " << errno << endl;
+            cout << "Error looking up host '" << inHostname << "': " << strerror(errno) << " (" << errno << ")." << endl;
             return;
         }
         std::string IPAddress(inet_ntoa(**(in_addr **) hostname->h_addr_list));
@@ -32,7 +32,7 @@ namespace vanguard {
 
         mSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (mSocket == -1) {
-            cerr << "Error: Couldn't create socket (" << errno << ")." << endl;
+            cerr << "Error: Couldn't create socket: " << strerror(errno) << " (" << errno << ")." << endl;
             return;
         }
 
@@ -55,13 +55,17 @@ namespace vanguard {
 
 
     void vanguardbot_base::send_message(std::string inMessage) {
-        cout << "Sending: " << inMessage << endl;
+        if (inMessage.find("PASS oauth:") == 0) {
+            cout << "Sending: PASS oauth:*****" << endl;
+        } else {
+            cout << "Sending: " << inMessage << endl;
+        }
         std::string messageWithLineBreak(inMessage);
         messageWithLineBreak.append("\r\n");
 
         ssize_t result = send(mSocket, messageWithLineBreak.c_str(), messageWithLineBreak.length(), 0);
         if (result == -1) {
-            cerr << "send failed: " << errno << endl;
+            cerr << "send failed: " << strerror(errno) << " (" << errno << ")." << endl;
         }
     }
 
@@ -81,20 +85,20 @@ namespace vanguard {
         auto now = steady_clock::now();
         for (auto currTimer = mTimers.begin(); currTimer != mTimers.end(); ) {
             if (currTimer->mNextFireTime <= now) {
-                cout << "\tRunning timer." << endl;
+                //cout << "\tRunning timer." << endl;
                 currTimer->mHandler();
                 if (currTimer->mRepeat) {
                     // TODO: Can cause drift, but at least it guarantees we don't fire again immediately if we expired
                     //  ages ago because the computer went to sleep or whatever and now have 5 hours to catch up.
-                    cout << "\t\tScheduling timer for " << currTimer->mDelay.count() << " seconds from now." << endl;
+                    //cout << "\t\tScheduling timer for " << currTimer->mDelay.count() << " seconds from now." << endl;
                     currTimer->mNextFireTime = now + currTimer->mDelay;
                     ++currTimer;
                 } else {
-                    cout << "\t\tRemoved non-repeating timer." << endl;
+                    //cout << "\t\tRemoved non-repeating timer." << endl;
                     currTimer = mTimers.erase(currTimer);
                 }
             } else {
-                cout << "\tSkipping future timer." << endl;
+                //cout << "\tSkipping future timer." << endl;
                 ++currTimer;
             }
         }
@@ -121,20 +125,20 @@ namespace vanguard {
             FD_SET(mSocket, &fdSet);
             int selResult = select(mSocket + 1, &fdSet, nullptr, nullptr, &timeout);
             if (selResult == 0) { // time-out
-                cout << "Checking for timers." << endl;
+                //cout << "Checking for timers." << endl;
                 fire_expired_timers();
             } else if (selResult == -1) { // Error
                 cerr << "Error waiting for socket: " << strerror(errno) << endl;
                 fire_expired_timers();
             } else {
-                cout << "Received network data." << endl;
+                //cout << "Received network data." << endl;
                 char buffer[513] = {};
                 ssize_t amount = recv(mSocket, buffer, sizeof(buffer) - 1, 0);
                 if (amount <= 0) {
-                    cerr << "Error reading socket: " << strerror(errno) << endl;
+                    cerr << "Error reading socket: " << strerror(errno) << " (" << errno << ")." << endl;
                     break;
                 }
-                cout << "\t" << amount << " bytes." << endl;
+                //cout << "\t" << amount << " bytes." << endl;
 
                 mMessageBuffer.append(buffer);
                 process_full_lines();
@@ -145,7 +149,8 @@ namespace vanguard {
 
     void vanguardbot_base::perform_after(chrono::minutes delay, bool repeat, function<void()> handler) {
         cout << "Added timer: " << delay.count() << " minutes" << (repeat ? " (repeating)" : "") << "." << endl;
-        mTimers.push_back(TimerEntry{steady_clock::time_point::min(), handler, repeat, duration_cast<seconds>(delay) });
+        auto delaySeconds = duration_cast<seconds>(delay);
+        mTimers.push_back(TimerEntry{steady_clock::now() + delaySeconds, handler, repeat, delaySeconds });
     }
 
 } /* vanguard */

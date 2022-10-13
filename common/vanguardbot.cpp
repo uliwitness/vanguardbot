@@ -91,12 +91,13 @@ namespace vanguard {
 			add_protocol_command_handler("USERSTATE", [this](irc_command inCommand)
 										 {
 				string userName(tolower(inCommand.tags["display-name"]));
-				mUserTags[userName] = inCommand.tags;
-				
-				mUserTags[userName][";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
+                map<string,string>& userTags = mUserTags[userName];
+                userTags = inCommand.tags;
+
+                userTags[";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
 
 				cout << "User State: " << userName << ":\n";
-				for( auto tagPair : mUserTags[userName] )
+				for( auto tagPair : userTags )
 				{
 					cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
 				}
@@ -114,11 +115,17 @@ namespace vanguard {
 			});
 
 			add_bot_command_handler("*", [this](irc_command inCommand)
-									{
+			{
 				send_chat_message("This looks like nothing to me.");
 			}, false, false);
-			
-			path	commandsFolderPath(inFolderPath);
+
+            add_bot_command_handler("quit", [this](irc_command inCommand)
+            {
+                send_chat_message("Quitting.");
+                quit();
+            }, true, false);
+
+            path	commandsFolderPath(inFolderPath);
 			if (exists(commandsFolderPath))
 			{
 				directory_iterator	directoryIterator(commandsFolderPath);
@@ -252,8 +259,8 @@ namespace vanguard {
 			
 			if( addCommandName.length() > 0 )
 			{
-				bool addMustBeManagement = tolower(commandInfo.value_for_key("incrementcommandmustbemanagement")) == "true";
-				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("incrementcommandmustbesubscriber")) == "true";
+				bool addMustBeManagement = tolower(commandInfo.value_for_key("incrementCommandMustBeManagement")) == "true";
+				bool addMustBeSubscriber = tolower(commandInfo.value_for_key("incrementCommandMustBeSubscriber")) == "true";
 
 				add_bot_command_handler(addCommandName, [this, quotesFilePath, incrementResponse](irc_command inCommand)
 										{
@@ -494,9 +501,11 @@ namespace vanguard {
 			string userName(tolower(inCommand.userName));
 			cout << "User State: " << userName << ":\n";
 			map<string,string>& userTags = mUserTags[userName];
-			
+
 			userTags["badges"] = field_from_map("badges", inCommand.tags);
 			userTags["color"] = field_from_map("color", inCommand.tags);
+
+            userTags[";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
 
 			cout << "User State: " << userName << ":\n";
 			for( auto tagPair : userTags )

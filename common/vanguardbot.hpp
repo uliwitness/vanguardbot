@@ -29,7 +29,7 @@ namespace vanguard {
 		bool mustBeManagement;
 		bool mustBeSubscriber;
 	};
-	
+
 	
 	class vanguardbot : public vanguardbot_base
 	{
@@ -40,6 +40,8 @@ namespace vanguard {
 		
 		void	log_in(string userName, string password, string channelName);
 		void	log_out();
+
+        void    quit() { log_out(); mKeepRunning = false; }
 		
 		//! Send a chat message to the server.
 		void	send_chat_message(const string& msg, bool invisible = false);

@@ -54,12 +54,15 @@ If you follow the usual convention of having a separate bot user (say, `jennys_b
 ## Commands
 
 Commands are kept in a folder you specify to the server (By default, this is `~/Application Support/vanguardbot/` on
-macOS).
+macOS, on Linux we recommend using `~/.config/vanguardbot/` and passing that as the first argument to Vanguardbot).
 
 That folder contains a subfolder for each command, named after the command. Each folder contains an `info.ini` file
 describing the command's settings. There is also a special subfolder named `data` which the commands can use to store
 user data (for example, the quote command uses this to save the list of quotes in a text file named after the command,
 e.g. `quote.txt`).
+
+If you add the line `mustBeManagement=true` to a command, that command will only be usable by moderators and the
+broadcaster themselves. Similarly, add a `mustBeSubscriber=true` line to let only subscribers use a command.
 
 ### Quote Command
 
@@ -82,6 +85,10 @@ its `info.ini` file read:
     type=quote
     filename=jokes.txt
     addcommand=addjoke
+
+Note that `mustBeManagement` and  `mustBeSubscriber` only apply to the main command. To specify that only subscribers
+or moderators/broadcaster may use the add command, use `addCommandMustBeManagement=true` and
+`addCommandMustBeSubscriber=true`.
 
 ### Name Pool / Queue
 
@@ -160,6 +167,10 @@ incremented. You can write three placeholders in the responses:
 `$USERNAME` - The name of the user who invoked the counter command.
 
 To have multiple counters, use different `filename` and `incrementcommand` values, and folder names.
+
+Note that `mustBeManagement` and  `mustBeSubscriber` only apply to the main command. To specify that only subscribers
+or moderators/broadcaster may use the increment command, use `incrementCommandMustBeManagement=true` and
+`incrementCommandMustBeSubscriber=true`.
 
 ### Timers
 

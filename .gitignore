@@ -6,3 +6,5 @@ Generated Files
 *.vcxproj.filters
 *.xcuserdatad
 .DS_Store
+cmake-build-debug/
+common/example_commands/data/

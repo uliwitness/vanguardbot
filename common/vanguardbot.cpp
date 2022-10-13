@@ -2,6 +2,9 @@
 #include "ini_file.hpp"
 #include <iostream>
 #include <time.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 #include <filesystem>
 #include <fstream>
 #include "string_utils.hpp"
@@ -144,7 +147,6 @@ namespace vanguard {
 				cerr << "No directory " << commandsFolderPath.string() << endl;
 			}
 			
-			
 			inReadyToRunHandler();
 		});
 	}
@@ -161,8 +163,7 @@ namespace vanguard {
 		bool mustBeManagement = tolower(commandInfo.value_for_key("mustBeManagement")) == "true";
 		bool mustBeSubscriber = tolower(commandInfo.value_for_key("mustBeSubscriber")) == "true";
 
-		if (commandType.compare("quote") == 0)
-		{
+		if (commandType.compare("quote") == 0) {
 			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
 			
 			string	addCommandName = commandInfo.value_for_key("addcommand");
@@ -223,9 +224,7 @@ namespace vanguard {
 					}
 				}, addMustBeManagement, addMustBeSubscriber);
 			}
-		}
-		else if (commandType.compare("counter") == 0)
-		{
+		} else if (commandType.compare("counter") == 0) {
 			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
 			
 			string	addCommandName = commandInfo.value_for_key("incrementcommand");
@@ -285,29 +284,43 @@ namespace vanguard {
 					send_chat_message(msg);
 				}, addMustBeManagement, addMustBeSubscriber);
 			}
-		}
-		else if (commandType.compare("timer") == 0)
-		{
-			cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
-			
-			string			message = commandInfo.value_for_key("message");
-			chrono::minutes	delay = chrono::minutes( atoll(commandInfo.value_for_key("intervalminutes").c_str()));
+		} else if (commandType.compare("timer") == 0) {
+            cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
 
-				if( message.find("!") == 0 )
-				{
-					perform_after(delay, true, [this, message]()
-								  {
-						send_chat_message(message, true); // Only shows result of the command.
-					});
-				}
-				else
-				{
-					perform_after(delay, true, [this, message]()
-								  {
-						send_chat_message(message);
-					});
-				}
-		}
+            string message = commandInfo.value_for_key("message");
+            chrono::minutes delay = chrono::minutes(atoll(commandInfo.value_for_key("intervalminutes").c_str()));
+
+            if (message.find("!") == 0) {
+                perform_after(delay, true, [this, message]() {
+                    send_chat_message(message, true); // Only shows result of the command.
+                });
+            } else {
+                perform_after(delay, true, [this, message]() {
+                    send_chat_message(message);
+                });
+            }
+        }
+#ifndef _WIN32
+        else if (commandType.compare("shell") == 0) {
+            cout << "Adding command: " << commandName << " (" << commandType << ")" << endl;
+
+            string			shellCmd = commandInfo.value_for_key("command");
+            string			message = commandInfo.value_for_key("message");
+
+            add_bot_command_handler(commandName, [this, shellCmd, message, inCommandFolder](irc_command inCommand)
+            {
+                if (!message.empty()) {
+                    string msg(message);
+                    replace_with_in("$CHANNELNAME", mChannelName, msg);
+                    replace_with_in("$USERNAME", inCommand.userName, msg);
+                    send_chat_message(msg);
+                }
+                chdir(inCommandFolder.c_str());
+                int resultStatus = system(shellCmd.c_str());
+                cout << "Executed '" << shellCmd << "' -> " << resultStatus << endl;
+            }, mustBeManagement, mustBeSubscriber);
+        }
+#endif
 	}
 	
 	

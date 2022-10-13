@@ -199,6 +199,30 @@ The cool thing here is that timers know about commands and will not actually sen
 It will just internally pretend that it received this message and show the output from the command (in this case
 from `!hydrate`).
 
+### Shell commands
+
+A shell command runs a simple command in your current shell. This allows you to trigger external processes to do more
+advanced things that Vanguardbot would not be able to do on its own. For example, if you wanted to implement a sound
+command on Linux, you could use the `mpv` player package in a command like the following:
+
+    type=shell
+    command=mpv sound.mp3
+    message=*laughs hysterically*
+
+Here, `command` is the shell command to run. This command will be executed with the current directory set to the
+command's folder. So you can put the sound file `sound.mp3` into the command's folder next to the `info.ini` file,
+and can use a relative path to refer to it. Or you could just run a script in some other scripting language by e.g.
+specifying `command=ruby myScript.rb` or so.
+
+You can optionally specify a `message`, which will be sent to Twitch chat before the command is run. You can use the
+placeholders `$CHANNELNAME` and `$USERNAME` in this message.
+
+**Note:** This command currently only works on macOS and Linux.
+
+**Note:** The example command `!laugh` in this repository does not include the sound file, you have to provide your own.
+
+**Note:** Output from the script currently just goes to the bot's output. It is not sent to Twitch chat.
+
 ### User List / Credits
 
 Vanguardbot keeps a `data/todayseenusers.txt` list of all users that have actively chatted, one username per line, that

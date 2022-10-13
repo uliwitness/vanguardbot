@@ -23,10 +23,13 @@ interactions with your viewers.
 - Setup GUI for creating commands
 - Working Windows support
 - Built-in OAuth login support (at least for GUI)
+- Launching executables (e.g. shell scripts)
 
 ## Operating Systems
 
-Right now Vanguardbot works on **Linux** and **macOS**. I started creating a Visual Studio Solution for Windows, but
+Right now Vanguardbot works on **Linux** and **macOS**.
+
+I started creating a Visual Studio Solution for Windows, but
 can't get the entitlements to work (it can't access its files on disk). If anyone is more familiar with entitlements
 under Windows, help would be appreciated.
 
@@ -34,18 +37,18 @@ under Windows, help would be appreciated.
 
 If you're running the command line version of this bot (instead of a GUI), launch it with the syntax:
 
-    ./vanguardbot <commandsFolder> <userName> oauth:<oauthToken> [<channel>]
+    ./vanguardbot <userName> oauth:<oauthToken> [<channel> [<commandsFolder>]]
 
 Where
 
-- `commandsFolder` - The folder containing one folder each with an `.ini` file for each command the bot should
-  understand.
 - `userName` - The name of the user as which the chatbot should run.
 - `oauthToken` - An OAuth token to let Vanguardbot log in as the chatbot user and talk to Twitch chat (this is what will
   be sent as the IRC password, but is not the password that user uses to log into Twitch). You can get an OAuth token
   e.g. via https://twitchapps.com/tmi/
 - `channel` - The name of the channel whose chat you want the bot to watch for commands and where you want it to post.
   If you leave away `channel`, `userName` will be used as the channel name too.
+- `commandsFolder` - The folder containing one folder each with an `.ini` file for each command the bot should
+  understand.
 
 If you follow the usual convention of having a separate bot user (say, `jennys_bot`) and your own streamer user (say,
 `jenny_strimmah`), then the channel would be `jenny_strimmah` while the `userName` would be `jennys_bot`, and the
@@ -53,8 +56,9 @@ If you follow the usual convention of having a separate bot user (say, `jennys_b
  
 ## Commands
 
-Commands are kept in a folder you specify to the server (By default, this is `~/Application Support/vanguardbot/` on
-macOS, on Linux we recommend using `~/.config/vanguardbot/` and passing that as the first argument to Vanguardbot).
+Commands are kept in a special folder. By default, this is `~/Application Support/vanguardbot/` on macOS,
+on Linux `~/.config/vanguardbot/` is used. You can pass a `commandsFolder` to Vanguardbot on the command line to
+override this default.
 
 That folder contains a subfolder for each command, named after the command. Each folder contains an `info.ini` file
 describing the command's settings. There is also a special subfolder named `data` which the commands can use to store
@@ -63,6 +67,8 @@ e.g. `quote.txt`).
 
 If you add the line `mustBeManagement=true` to a command, that command will only be usable by moderators and the
 broadcaster themselves. Similarly, add a `mustBeSubscriber=true` line to let only subscribers use a command.
+
+For example commands, see the `common/example_commands/` folder in this repository.
 
 ### Quote Command
 
@@ -200,3 +206,11 @@ you can use to e.g. feed a credits text overlay at the end of your stream. This 
 Vanguardbot for the first time. It also keeps a `data/seenusers.txt` file, which does not get cleared and collects the
 names of all users that have chatted whenever you had Vanguardbot running. You can use this to find out when a new user
 chats for the first time.
+
+## Building
+
+To build Vanguardbot:
+
+On Linux, use CMake or just open the repository folder with CLion.
+On macOS, use the `vanguardbot.xcodeproj`.
+On Windows, use the `vanguardbot_win.sln`.

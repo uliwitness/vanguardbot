@@ -4,16 +4,17 @@
 #include <time.h>
 #ifndef _WIN32
 #include <unistd.h>
-#include <curl/curl.h>
+#include "twitch.hpp"
 #endif
 #include <filesystem>
 #include <fstream>
 #include "string_utils.hpp"
 
 namespace vanguard {
-	
-	using namespace std;
-	
+
+    using namespace std;
+    using namespace vanguard;
+
 #ifdef _WIN32
 	using namespace std::experimental::filesystem::v1;
 #else
@@ -26,11 +27,6 @@ namespace vanguard {
 		auto foundBadge = tags.find(key);
 		return (foundBadge == tags.end() ? fallback : foundBadge->second);
 	}
-
-    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, string* data) {
-        data->append((char*) ptr, size * nmemb);
-        return size * nmemb;
-    }
 
 	void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	{
@@ -103,11 +99,13 @@ namespace vanguard {
 
                 userTags[";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
 
+#if VERBOSE_LOGGING
 				cout << "User State: " << userName << ":\n";
 				for( auto tagPair : userTags )
 				{
 					cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
 				}
+#endif
 			});
 
 			add_protocol_command_handler("ROOMSTATE", [this](irc_command inCommand)
@@ -516,7 +514,9 @@ namespace vanguard {
 		else if (inCommand.command.compare("PRIVMSG") == 0 && inCommand.params.size() > 1)
 		{
 			string userName(tolower(inCommand.userName));
+#if VERBOSE_LOGGING
 			cout << "User State: " << userName << ":\n";
+#endif
 			map<string,string>& userTags = mUserTags[userName];
 
 			userTags["badges"] = field_from_map("badges", inCommand.tags);
@@ -524,11 +524,13 @@ namespace vanguard {
 
             userTags[";management"] = (field_from_map("mod", inCommand.tags) == "1" || userName == tolower(mChannelName)) ? "1" : "0";
 
+#if VERBOSE_LOGGING
 			cout << "User State: " << userName << ":\n";
 			for( auto tagPair : userTags )
 			{
 				cout << "\t" << tagPair.first << ": " << tagPair.second << "\n";
 			}
+#endif
 
 			string currUser(tolower(inCommand.userName));
 			if( mEverSeenUsers.find(currUser) == mEverSeenUsers.end() )
@@ -560,7 +562,7 @@ namespace vanguard {
 			string paramsStr(inCommand.params[1]);	// 0 is channel name.
 			if( paramsStr.length() > 1 && paramsStr[0] == '!' )
 			{
-				size_t partSeparatorOffset = paramsStr.find(" ");
+				size_t partSeparatorOffset = paramsStr.find(' ');
 				if (partSeparatorOffset == string::npos)
 					partSeparatorOffset = paramsStr.length();
 				
@@ -570,7 +572,7 @@ namespace vanguard {
 					botCommand.params.push_back(paramsStr.substr(partSeparatorOffset + 1, paramsStr.length() - (partSeparatorOffset - 1)));
 				}
 				
-				map<string, bot_command_handler_entry>::iterator foundHandler = mBotCommandHandlers.find(botCommand.command);
+				auto foundHandler = mBotCommandHandlers.find(botCommand.command);
 				if (foundHandler != mBotCommandHandlers.end()
 					&& (!foundHandler->second.mustBeSubscriber || userTags["subscriber"] == "1")
 					&& (!foundHandler->second.mustBeManagement || userTags[";management"] == "1"))
@@ -672,34 +674,17 @@ namespace vanguard {
 		
 		send_chat_message("Hi.");
 
-        curl_global_init(CURL_GLOBAL_ALL);
-        CURL *curlHandle = curl_easy_init();
-        if (!curlHandle) {
-            cerr << "Couldn't open CURL handle." << endl;
-        } else {
-            string responseBody;
-            string responseHeaders;
-            long httpStatus = 0;
-            struct curl_slist *headers = nullptr;
+#ifndef _WIN32
+        twitch::init();
 
-            headers = curl_slist_append(headers, (string("Authorization: Bearer ") + mPassword).c_str());
+        twitch connection(mChannelName, mPassword);
+        auto userID = connection.user_id();
+        auto channelInfo = connection.channel_info(userID);
 
-            curl_easy_setopt(curlHandle, CURLOPT_VERBOSE, 1L);
-            curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-            curl_easy_setopt(curlHandle, CURLOPT_URL, (string("https://api.twitch.tv/helix/users?login=") + mUserName).c_str());
-            curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, writeFunction);
-            curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseBody);
-            curl_easy_setopt(curlHandle, CURLOPT_HEADERDATA, &responseHeaders);
-            curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpStatus);
-
-            CURLcode res = curl_easy_perform(curlHandle);
-            if (res != CURLE_OK) {
-                cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
-            }
-            curl_easy_cleanup(curlHandle);
-
-            cout << "STATUS: " << httpStatus << "\nHEADERS:\n" << responseHeaders << "\n\n" << responseBody << endl ;
-        }
+        cout << "title: " << channelInfo.mTitle << "\n"
+            << "game: " << channelInfo.mGameName << " ("
+            << channelInfo.mGameID << ")" << endl;
+#endif
 	}
 	
 	

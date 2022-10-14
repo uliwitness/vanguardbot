@@ -9,3 +9,4 @@ Generated Files
 cmake-build-debug/
 common/example_commands/data/
 common/example_commands/laugh/sound.mp3
+common/client_id.h

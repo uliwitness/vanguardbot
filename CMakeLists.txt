@@ -11,7 +11,10 @@ add_executable(vanguardbot unix/main.cpp
         common/string_utils.cpp
         common/string_utils.hpp
         common/vanguardbot.cpp
-        common/vanguardbot.hpp)
+        common/vanguardbot.hpp
+        common/client_id.h
+        json11/json11.cpp
+        json11/json11.hpp common/twitch.cpp common/twitch.hpp)
 
 find_package( CURL REQUIRED )
 
@@ -21,4 +24,3 @@ target_include_directories(vanguardbot SYSTEM PRIVATE ${CURL_INCLUDE_DIRS})
 
 target_link_libraries(vanguardbot CURL::libcurl)
 
-message(STATUS "CURL_INCLUDE_DIRS = ${CURL_INCLUDE_DIRS}")

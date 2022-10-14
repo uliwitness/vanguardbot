@@ -235,6 +235,11 @@ chats for the first time.
 
 To build Vanguardbot:
 
+Create an application Client ID and OAuth token on your Twitch account.
+Add a `common/client_id.h` file that defines a string constant with the client ID like:
+
+    #define CLIENT_ID "qwqrwqwerqwer324ewrqr32ewr"
+
 On Linux, use CMake or just open the repository folder with CLion.
 On macOS, use the `vanguardbot.xcodeproj`.
 On Windows, use the `vanguardbot_win.sln`.

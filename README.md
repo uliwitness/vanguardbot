@@ -15,15 +15,15 @@ interactions with your viewers.
 - Credits / active users list
 - Moderator-only commands
 - Timers that trigger messages or commands
+- Launching executables (e.g. shell scripts)
 
 ## Planned Features
 
-- Command groups
 - Commands for setting the game and stream title on Twitch based on presets
+- Command groups
+- Built-in OAuth login support (at least for GUI)
 - Setup GUI for creating commands
 - Working Windows support
-- Built-in OAuth login support (at least for GUI)
-- Launching executables (e.g. shell scripts)
 
 ## Operating Systems
 

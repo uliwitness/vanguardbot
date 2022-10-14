@@ -134,7 +134,7 @@ namespace vanguard {
                 //cout << "Received network data." << endl;
                 char buffer[513] = {};
                 ssize_t amount = recv(mSocket, buffer, sizeof(buffer) - 1, 0);
-                if (amount <= 0) {
+                if (amount <= 0 && errno != 0) {
                     cerr << "Error reading socket: " << strerror(errno) << " (" << errno << ")." << endl;
                     break;
                 }

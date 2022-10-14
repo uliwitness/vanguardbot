@@ -70,9 +70,15 @@ namespace vanguard {
 					mNoticeHandler(inCommand.params[1]);
 				}
 			});
-			
+
+            set_privmsg_handler([this](irc_command inCommand)
+            {
+                cout << inCommand.userName << ": " << (inCommand.params.size() > 1 ? inCommand.params[1].c_str() : "") << endl;
+            });
+
 			add_protocol_command_handler("*", [this](irc_command inCommand)
-										 {
+			{
+#if VERBOSE_LOGGING
 				cout << "Received: " << inCommand.userName << ": " << inCommand.command;
 				for( const string& currParam : inCommand.params )
 				{
@@ -89,6 +95,7 @@ namespace vanguard {
 					tagsString.erase();
 				}
 				cout << "|" << inCommand.prefix << "\n[" << tagsString << "]" << endl;
+#endif
 			});
 
 			add_protocol_command_handler("USERSTATE", [this](irc_command inCommand)
@@ -126,7 +133,7 @@ namespace vanguard {
 
             add_bot_command_handler("quit", [this](irc_command inCommand)
             {
-                send_chat_message("Quitting.");
+                send_chat_message("OK, I'm leaving. Have a great day.");
                 quit();
             }, true, false);
 
@@ -137,7 +144,7 @@ namespace vanguard {
 				for ( ; directoryIterator != directory_iterator(); ++directoryIterator )
 				{
 					const directory_entry& currFile = *directoryIterator;
-					if (currFile.path().filename().string().compare("data") == 0 || currFile.path().filename().string().find(".") == 0)
+					if (currFile.path().filename().string() == "data" || currFile.path().filename().string().find('.') == 0)
 					{
 						continue;
 					}

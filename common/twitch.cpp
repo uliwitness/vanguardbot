@@ -53,7 +53,7 @@ namespace vanguard {
         headers = curl_slist_append(headers, (string("Authorization: Bearer ") + mPassword.substr(6)).c_str());
         headers = curl_slist_append(headers, "Client-Id: " CLIENT_ID);
 
-        curl_easy_setopt(mCurlHandle, CURLOPT_VERBOSE, 1L);
+        //curl_easy_setopt(mCurlHandle, CURLOPT_VERBOSE, 1L);
         curl_easy_setopt(mCurlHandle, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(mCurlHandle, CURLOPT_URL, url.c_str());
         curl_easy_setopt(mCurlHandle, CURLOPT_WRITEFUNCTION, writeFunction);
@@ -66,7 +66,8 @@ namespace vanguard {
         }
         curl_easy_getinfo(mCurlHandle, CURLINFO_RESPONSE_CODE, &httpStatus);
 
-        cout << "STATUS: " << httpStatus << "\n" << responseHeaders << responseBody << "\n" << endl;
+
+        //cout << "STATUS: " << httpStatus << "\n" << responseHeaders << responseBody << "\n" << endl;
 
         string errMsg;
         auto json = json11::Json::parse(responseBody, errMsg);

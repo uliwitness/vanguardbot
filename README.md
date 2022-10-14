@@ -37,7 +37,7 @@ under Windows, help would be appreciated.
 
 If you're running the command line version of this bot (instead of a GUI), launch it with the syntax:
 
-    ./vanguardbot <userName> oauth:<oauthToken> [<channel> [<commandsFolder>]]
+    ./vanguardbot <userName> oauth:<oauthToken> [<channel> oauth:<channelToken> [<commandsFolder>]]
 
 Where
 
@@ -47,6 +47,9 @@ Where
   e.g. via https://twitchapps.com/tmi/
 - `channel` - The name of the channel whose chat you want the bot to watch for commands and where you want it to post.
   If you leave away `channel`, `userName` will be used as the channel name too.
+- `channelToken` - The OAuth token for the channel owner. This is needed to make certain Twitch API requests
+  like set the stream title or current game, which only the channel owner is permitted to do. If you leave away
+  `channelToken`, `oauthToken` above will be used instead.
 - `commandsFolder` - The folder containing one folder each with an `.ini` file for each command the bot should
   understand.
 

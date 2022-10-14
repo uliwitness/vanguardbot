@@ -134,7 +134,7 @@ namespace vanguard {
             add_bot_command_handler("quit", [this](irc_command inCommand)
             {
                 send_chat_message("OK, I'm leaving. Have a great day.");
-                quit();
+                set_keep_running(false);
             }, true, false);
 
             path	commandsFolderPath(inFolderPath);
@@ -660,7 +660,7 @@ namespace vanguard {
 	}
 	
 	
-	void	vanguardbot::log_in(std::string userName, std::string password, std::string channelName)
+	void	vanguardbot::log_in(const string &userName, const string &password, const string &channelName, const string &channelPassword)
 	{
 		mChannelName = channelName;
 		mUserName = userName;
@@ -684,13 +684,24 @@ namespace vanguard {
 #ifndef _WIN32
         twitch::init();
 
-        twitch connection(mChannelName, mPassword);
-        auto userID = connection.user_id();
-        auto channelInfo = connection.channel_info(userID);
+        twitch botConnection(mChannelName, mPassword);
+        auto botUserID = botConnection.user_id();
+        auto channelInfo = botConnection.channel_info(botUserID);
 
         cout << "title: " << channelInfo.mTitle << "\n"
             << "game: " << channelInfo.mGameName << " ("
             << channelInfo.mGameID << ")" << endl;
+
+        twitch streamerConnection(mChannelName, channelPassword);
+        auto streamerUserID = botConnection.user_id();
+
+        // 7208 Myst IV: Revelation
+        // Return to Monkey Island
+        auto gameID = streamerConnection.game_id(streamerUserID, "Myst IV: Revelation");
+        streamerConnection.set_game(streamerUserID, gameID);
+        // This Atrus guy called! He needs our help again!
+        // Atrus is not home right now, please call Saveedro
+        streamerConnection.set_stream_title(streamerUserID, "This Atrus guy called! He needs our help again!");
 #endif
 	}
 	

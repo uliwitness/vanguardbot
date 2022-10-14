@@ -145,6 +145,8 @@ namespace vanguard {
                 fire_expired_timers();
             }
         }
+
+        log_out();
     }
 
     void vanguardbot_base::perform_after(chrono::minutes delay, bool repeat, function<void()> handler) {

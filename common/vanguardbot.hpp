@@ -36,12 +36,12 @@ namespace vanguard {
 	public:
 		vanguardbot() : vanguardbot_base() {}
 		
-		virtual void	connect(const string& inHostname, int inPortNumber, const string& inFolderPath, function<void()> inReadyToRunHandler);
+		void	connect(const string& inHostname, int inPortNumber, const string& inFolderPath, function<void()> inReadyToRunHandler);
 		
-		void	log_in(string userName, string password, string channelName);
-		void	log_out();
+		void	log_in(const string &userName, const string &password, const string &channelName, const string &channelPassword) override;
+		void	log_out() override;
 
-        void    quit() { log_out(); mKeepRunning = false; }
+        void    set_keep_running(bool state) { mKeepRunning = state; }
 		
 		//! Send a chat message to the server.
 		void	send_chat_message(const string& msg, bool invisible = false);

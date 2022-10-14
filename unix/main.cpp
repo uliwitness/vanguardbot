@@ -1,32 +1,44 @@
-#include <iostream>
 #include "vanguardbot.hpp"
+#include <iostream>
+#include <signal.h>
 
 using namespace std;
 using namespace vanguard;
+
+vanguardbot	gBot;
+
+static void sigterm_handler(int signum)
+{
+    gBot.set_keep_running(false);
+}
 
 int main(int argc, const char* *argv)
 {
     if (argc < 3)
     {
-        cerr << "Error: Parameters should be " << argv[0] << " <userName> oauth:<oauthToken> [<channel> [<commandsFolder>]]" << endl;
+        cerr << "Error: Parameters should be " << argv[0] << " <userName> oauth:<oauthToken> [<channel> <channelPassword> [<commandsFolder>]]" << endl;
         return 1;
     }
 
     std::string userName(argv[1]);
     std::string password(argv[2]);
     std::string channel;
+    string channelPassword;
     std::string commandsFolder;
-    if (argc > 3 && argv[3][0] != 0)
-    {
+    if (argc > 3 && argv[3][0] != 0) {
         channel = argv[3];
-    }
-    else
-    {
+    } else {
         channel = userName;
     }
-    if (argc > 4 && argv[4][0] != 0)
-    {
-        commandsFolder = argv[4];
+
+    if (argc > 4 && argv[4][0] != 0) {
+        channelPassword = argv[4];
+    } else {
+        channelPassword = password;
+    }
+
+    if (argc > 5 && argv[5][0] != 0) {
+        commandsFolder = argv[5];
     }
 
     if (commandsFolder.empty()) {
@@ -45,11 +57,14 @@ int main(int argc, const char* *argv)
         commandsFolder += "/vanguardbot/";
     }
 
-	vanguardbot	bot;
-	bot.connect("irc.chat.twitch.tv", 6667, commandsFolder, [&bot, userName, password, channel]()
+    struct sigaction action = {};
+    action.sa_handler = sigterm_handler;
+    sigaction(SIGTERM, &action, NULL);
+
+    gBot.connect("irc.chat.twitch.tv", 6667, commandsFolder, [userName, password, channel, channelPassword]()
 	{
-		bot.log_in(userName, password, channel);
-		bot.run();
+		gBot.log_in(userName, password, channel, channelPassword);
+		gBot.run();
 	});
 
     return 0;

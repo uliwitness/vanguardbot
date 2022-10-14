@@ -24,8 +24,12 @@ namespace vanguard {
 
         string user_id();
         ChannelInfo channel_info(const string &userID);
+        string game_id(const std::string &userID, const string &game);
 
-        Json get_request(const string& url);
+        void set_game(const std::string &userID, const string &gameID);
+        void set_stream_title(const std::string &userID, const string &title);
+
+        Json send_request(const string &url, const string &body = "", const char *method = nullptr);
 
     protected:
         CURL *mCurlHandle{nullptr};

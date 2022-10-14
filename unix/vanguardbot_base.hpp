@@ -15,8 +15,7 @@ namespace vanguard {
 
         virtual ~vanguardbot_base();
 
-        virtual void
-        connect(const std::string &inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler);
+        void connect(const std::string &inHostname, int inPortNumber, std::function<void()> inReadyToRunHandler);
 
         void send_message(std::string inMessage);
 
@@ -34,7 +33,8 @@ namespace vanguard {
 
         virtual void process_full_lines() = 0;
 
-        virtual void log_in(std::string userName, std::string password, std::string channelName) = 0;
+        virtual void log_in(const string &userName, const string &password, const string &channelName, const string &channelPassword) = 0;
+        virtual void log_out() = 0;
 
         chrono::seconds next_timer_fire_interval();
         void fire_expired_timers();

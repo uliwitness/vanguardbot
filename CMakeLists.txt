@@ -13,8 +13,10 @@ add_executable(vanguardbot unix/main.cpp
         common/vanguardbot.cpp
         common/vanguardbot.hpp
         common/client_id.h
+        common/twitch.cpp
+        common/twitch.hpp
         json11/json11.cpp
-        json11/json11.hpp common/twitch.cpp common/twitch.hpp)
+        json11/json11.hpp)
 
 find_package( CURL REQUIRED )
 

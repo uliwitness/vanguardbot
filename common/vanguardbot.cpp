@@ -4,6 +4,7 @@
 #include <time.h>
 #ifndef _WIN32
 #include <unistd.h>
+#include <curl/curl.h>
 #endif
 #include <filesystem>
 #include <fstream>
@@ -25,8 +26,11 @@ namespace vanguard {
 		auto foundBadge = tags.find(key);
 		return (foundBadge == tags.end() ? fallback : foundBadge->second);
 	}
-	
-	
+
+    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, string* data) {
+        data->append((char*) ptr, size * nmemb);
+        return size * nmemb;
+    }
 
 	void	vanguardbot::connect(const std::string& inHostname, int inPortNumber, const std::string& inFolderPath, std::function<void()> inReadyToRunHandler)
 	{
@@ -48,7 +52,7 @@ namespace vanguard {
 				mEverSeenUsers.insert(string(buffer));
 			}
 		}
-		
+
 		vanguardbot_base::connect(inHostname, inPortNumber, [inReadyToRunHandler, this, inFolderPath]()
 								  {
 			srand((unsigned)time(NULL));
@@ -651,6 +655,7 @@ namespace vanguard {
 	{
 		mChannelName = channelName;
 		mUserName = userName;
+        mPassword = password;
 		
 		string passMsg("PASS ");
 		passMsg.append(password);
@@ -666,6 +671,35 @@ namespace vanguard {
 		send_message(joinMsg);
 		
 		send_chat_message("Hi.");
+
+        curl_global_init(CURL_GLOBAL_ALL);
+        CURL *curlHandle = curl_easy_init();
+        if (!curlHandle) {
+            cerr << "Couldn't open CURL handle." << endl;
+        } else {
+            string responseBody;
+            string responseHeaders;
+            long httpStatus = 0;
+            struct curl_slist *headers = nullptr;
+
+            headers = curl_slist_append(headers, (string("Authorization: Bearer ") + mPassword).c_str());
+
+            curl_easy_setopt(curlHandle, CURLOPT_VERBOSE, 1L);
+            curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
+            curl_easy_setopt(curlHandle, CURLOPT_URL, (string("https://api.twitch.tv/helix/users?login=") + mUserName).c_str());
+            curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, writeFunction);
+            curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseBody);
+            curl_easy_setopt(curlHandle, CURLOPT_HEADERDATA, &responseHeaders);
+            curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpStatus);
+
+            CURLcode res = curl_easy_perform(curlHandle);
+            if (res != CURLE_OK) {
+                cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
+            }
+            curl_easy_cleanup(curlHandle);
+
+            cout << "STATUS: " << httpStatus << "\nHEADERS:\n" << responseHeaders << "\n\n" << responseBody << endl ;
+        }
 	}
 	
 	

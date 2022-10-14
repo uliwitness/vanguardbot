@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(linuxtestproject)
+project(vanguardbot)
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -13,5 +13,12 @@ add_executable(vanguardbot unix/main.cpp
         common/vanguardbot.cpp
         common/vanguardbot.hpp)
 
+find_package( CURL REQUIRED )
+
 target_include_directories(vanguardbot PRIVATE unix)
 target_include_directories(vanguardbot PRIVATE common)
+target_include_directories(vanguardbot SYSTEM PRIVATE ${CURL_INCLUDE_DIRS})
+
+target_link_libraries(vanguardbot CURL::libcurl)
+
+message(STATUS "CURL_INCLUDE_DIRS = ${CURL_INCLUDE_DIRS}")

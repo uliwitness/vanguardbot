@@ -88,7 +88,8 @@ namespace vanguard {
 		
 		string									mCommandsFolderPath; //!< Folder containing commands and data.
 		string									mChannelName; //!< Name of the stream channel.
-		string									mUserName; //!< Name of the bot user.
+        string									mUserName; //!< Name of the bot user.
+        string									mPassword; //!< OAuth token of the bot user.
 		map<string, irc_command_handler>		mProtocolCommandHandlers;
 		map<string, bot_command_handler_entry>	mBotCommandHandlers;
 		set<string>								mTodaySeenUsers; //!< Usernames.
